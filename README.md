@@ -27,15 +27,28 @@ it to GitHub Pages (Actions build type; self-enabled on first run). `.nojekyll` 
 Jekyll so directories/files beginning with an underscore and the raw HTML are served
 verbatim.
 
+## Standalone pages (not part of the wiki build)
+
+- `review.html` — the concept-graph **Expert Review** viewer (validation & categorization),
+  a self-contained snapshot copied manually from
+  `llm-wiki-tools/hierarchy_v2/12-concepts-graph/review.html`. It is **not** produced by the
+  wiki build and is not linked from the sidebar; reach it directly at
+  <https://ig0r.github.io/cnrt-pvmt-wiki-stage/review.html>. The `--exclude='review.html'` in
+  the re-sync below preserves it across wiki re-syncs.
+
 ## Re-syncing a fresh build
 
-From `llm-wiki-tools/`, regenerate the site and mirror it here (scaffolding preserved):
+From `llm-wiki-tools/`, regenerate the site (feedback embed on) and mirror it here — the
+scaffolding **and** the standalone `review.html` are preserved by the excludes:
 
 ```
-uv run output-builder/output_builder_md_html.py --clean
+uv run output-builder/output_builder_md_html.py --clean \
+  --out hierarchy_v2/13-concepts-graph-pages-html-feedback \
+  --tally-form-id q4qql9 --site-base-url https://ig0r.github.io/cnrt-pvmt-wiki-stage
 rsync -a --delete \
   --exclude='.git' --exclude='.github' --exclude='.nojekyll' --exclude='README.md' \
-  hierarchy_v2/13-concepts-graph-pages-html/ ../../cnrt-pvmt-wiki-stage/
+  --exclude='review.html' --exclude='.DS_Store' \
+  hierarchy_v2/13-concepts-graph-pages-html-feedback/ ../../cnrt-pvmt-wiki-stage/
 git -C ../../cnrt-pvmt-wiki-stage add -A && \
   git -C ../../cnrt-pvmt-wiki-stage commit -m "Update staging build" && \
   git -C ../../cnrt-pvmt-wiki-stage push
