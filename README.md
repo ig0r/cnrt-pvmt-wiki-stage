@@ -29,12 +29,18 @@ verbatim.
 
 ## Standalone pages (not part of the wiki build)
 
-- `review.html` — the concept-graph **Expert Review** viewer (validation & categorization),
-  a self-contained snapshot copied manually from
-  `llm-wiki-tools/hierarchy_v2/12-concepts-graph/review.html`. It is **not** produced by the
-  wiki build and is not linked from the sidebar; reach it directly at
-  <https://ig0r.github.io/cnrt-pvmt-wiki-stage/review.html>. The `--exclude='review.html'` in
-  the re-sync below preserves it across wiki re-syncs.
+Self-contained concept-graph **review** viewers, copied manually from
+`llm-wiki-tools/hierarchy_v2/12-concepts-graph-pages/_graph/`. They are **not** produced by the
+wiki build and are not linked from the sidebar; reach them directly (`review_before.html`
+cross-links to `review.html`, so both are co-hosted):
+
+- `review.html` — Expert Review (validation & categorization):
+  <https://ig0r.github.io/cnrt-pvmt-wiki-stage/review.html>
+- `review_before.html` — Review (BEFORE re-parenting):
+  <https://ig0r.github.io/cnrt-pvmt-wiki-stage/review_before.html>
+
+The `--exclude='review.html' --exclude='review_before.html'` in the re-sync below preserve them
+across wiki re-syncs.
 
 ## Re-syncing a fresh build
 
@@ -47,7 +53,7 @@ uv run output-builder/output_builder_md_html.py --clean \
   --tally-form-id q4qql9 --site-base-url https://ig0r.github.io/cnrt-pvmt-wiki-stage
 rsync -a --delete \
   --exclude='.git' --exclude='.github' --exclude='.nojekyll' --exclude='README.md' \
-  --exclude='review.html' --exclude='.DS_Store' \
+  --exclude='review.html' --exclude='review_before.html' --exclude='.DS_Store' \
   hierarchy_v2/13-concepts-graph-pages-html-feedback/ ../../cnrt-pvmt-wiki-stage/
 git -C ../../cnrt-pvmt-wiki-stage add -A && \
   git -C ../../cnrt-pvmt-wiki-stage commit -m "Update staging build" && \
