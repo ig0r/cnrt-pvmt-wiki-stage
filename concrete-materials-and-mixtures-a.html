@@ -1,0 +1,299 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Concrete Materials &amp; Mixtures</title>
+<style>
+:root {
+  --bg: #ffffff;
+  --fg: #1c1c1c;
+  --ink: #1c1c1c;
+  --muted: #5b6472;
+  --sub: #5b6472;
+  --border: #e4e0da;
+  --line: #e4e0da;
+  --chip: #f1ede6;
+  --code: #f4f4f0;
+  --accent: #7a4a63;
+  --link: #2456c7;
+  --sidebar-bg: #23222a;
+  --sidebar-ink: #eae7e2;
+  --sidebar-sub: #9d97a8;
+  --sidebar-line: rgba(255, 255, 255, 0.1);
+  --sidebar-active: #c98fa8;
+  --sidebar-width: 300px;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body { margin: 0; padding: 0; background: var(--bg); color: var(--fg);
+  font: 16px/1.65 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+
+/* a11y: focus-visible (light content + dark sidebar) + skip link (FR-OB-14.1) */
+:focus-visible { outline: 2px solid var(--link); outline-offset: 2px; }
+.sidebar :focus-visible { outline: 2px solid var(--sidebar-active); outline-offset: 2px; }
+.skip-link { position: absolute; left: -9999px; top: 0; background: var(--bg);
+  color: var(--link); padding: .5rem 1rem; border: 1px solid var(--border); z-index: 100; }
+.skip-link:focus { left: 0; }
+
+/* layout shell (adapted from example/00_table_of_contents.html) */
+.shell { display: flex; min-height: 100vh; }
+.sidebar { position: sticky; top: 0; align-self: flex-start; width: var(--sidebar-width);
+  flex: 0 0 var(--sidebar-width); height: 100vh; overflow-y: auto; background: var(--sidebar-bg);
+  color: var(--sidebar-ink); padding: 28px 20px 40px;
+  font-family: "Helvetica Neue", Arial, sans-serif; }
+.sidebar-head { margin-bottom: 18px; padding-bottom: 16px;
+  border-bottom: 1px solid var(--sidebar-line); }
+.brand-kicker { margin: 0 0 6px; letter-spacing: .14em; text-transform: uppercase;
+  font-size: .72rem; color: var(--sidebar-active); font-weight: 700; }
+.brand-title { margin: 0 0 8px; font-size: 1.1rem; line-height: 1.3; font-weight: 700;
+  color: var(--sidebar-ink); }
+.brand-count { margin: 0; font-size: .8rem; color: var(--sidebar-sub); }
+.sidebar-filter { width: 100%; padding: .5rem .7rem; margin: 0 0 16px; font: inherit;
+  font-size: .85rem; color: var(--sidebar-ink); background: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--sidebar-line); border-radius: 6px; }
+.sidebar-filter::placeholder { color: var(--sidebar-sub); }
+.content { flex: 1 1 auto; min-width: 0; padding: 48px 56px 120px; max-width: none; }
+.nav-toggle { display: none; }
+
+/* sidebar hierarchy tree: native <details>, indent capped for 375px (FR-OB-6.4) */
+.tree, .tree ul { list-style: none; margin: 0; padding: 0; }
+.tree li { padding: 1px 0; }
+.tree ul { margin-left: .3rem; padding-left: .6rem; border-left: 1px solid var(--sidebar-line); }
+.tree a { display: inline-block; color: var(--sidebar-sub); text-decoration: none;
+  padding: 3px 6px; border-radius: 5px; overflow-wrap: break-word; word-break: break-word; }
+.tree a:hover { color: var(--sidebar-ink); background: rgba(255, 255, 255, 0.06); }
+.tree a.active { color: var(--sidebar-ink); font-weight: 700;
+  border-left: 3px solid var(--sidebar-active); padding-left: 6px;
+  background: rgba(201, 143, 168, 0.16); }
+.tree details { display: inline; }
+.tree summary { list-style: none; cursor: pointer; color: var(--sidebar-sub);
+  user-select: none; padding: 0 4px; display: inline-block; }
+.tree summary::-webkit-details-marker { display: none; }
+.tree details[open] > summary { color: var(--sidebar-ink); }
+.tree li[hidden] { display: none; }
+
+/* content typography */
+a { color: var(--link); text-decoration: none; }
+a:hover { text-decoration: underline; }
+h1 { font-size: 1.75rem; line-height: 1.25; margin: .1em 0 .4em;
+  border-bottom: 3px solid var(--accent); padding-bottom: .35em; color: var(--ink); }
+h2 { font-size: 1.25rem; color: var(--accent); margin-top: 2rem; padding-bottom: .3rem;
+  border-bottom: 1px solid var(--border); }
+h3 { font-size: 1.05rem; color: var(--sub); }
+p, li { color: var(--ink); }
+blockquote { margin: 1rem 0; padding: .1rem 1rem; border-left: 3px solid var(--border);
+  color: var(--muted); }
+hr { border: none; border-top: 1px solid var(--border); margin: 2rem 0; }
+code { background: var(--code); padding: .1em .35em; border-radius: 4px; font-size: .9em; }
+pre { background: var(--code); padding: .75rem 1rem; border-radius: 6px; overflow-x: auto; }
+pre code { background: none; padding: 0; }
+
+/* tables: override the example no-op with a scrolling block (FR-OB-5.1) */
+table { display: block; overflow-x: auto; border-collapse: collapse; margin: 1rem 0; }
+div.table-scroll { overflow-x: auto; margin: 1rem 0; }
+th, td { border: 1px solid var(--border); padding: .35rem .65rem; text-align: left; }
+th { background: var(--chip); }
+
+/* images capped to the content column (FR-OB-3.4) */
+img { max-width: 100%; height: auto; display: block; margin: 1rem 0;
+  border: 1px solid var(--border); border-radius: 4px; }
+article img { max-width: 100%; height: auto; }
+figure { margin: 1.4em 0; }
+figcaption { font-size: .86rem; color: var(--sub); margin-top: .5em; font-style: italic; }
+
+/* concept-viewer content classes, retuned to the light content palette */
+nav { margin-bottom: 1.5rem; font-size: .9rem; }
+.muted { color: var(--muted); }
+.meta { margin: .25rem 0 1.75rem; padding-bottom: 1.1rem;
+  border-bottom: 1px solid var(--border); font-size: .85rem; color: var(--muted); }
+.meta div { margin-top: .2rem; }
+.tag { display: inline-block; background: var(--chip); border: 1px solid var(--border);
+  border-radius: 999px; padding: 0 .6em; font-size: .74rem; color: var(--muted);
+  margin: 0 .15rem .15rem 0; white-space: nowrap; }
+a.tag:hover { text-decoration: none; color: var(--fg); border-color: var(--muted); }
+.src { font-size: .78em; color: var(--muted); }
+a.src { color: var(--link); }
+.missing { color: var(--muted); border-bottom: 1px dotted var(--muted); cursor: help; }
+.breadcrumb { color: var(--muted); }
+.breadcrumb a { color: var(--link); }
+.breadcrumb .crumb-sep { margin: 0 .35em; color: var(--muted); }
+.breadcrumb .crumb-current { color: var(--fg); }
+.part-of { color: var(--muted); }
+.part-of::before { content: "\2193 "; }
+.subconcepts { font-size: .92rem; color: var(--muted); margin: 0 0 1.6rem; }
+.subconcepts::before { content: "\25b8 "; }
+
+/* citation rules */
+sup a { text-decoration: none; color: var(--link); }
+.references { margin-top: 2.5rem; font-size: .9rem; }
+.references li { margin: .35rem 0; overflow-wrap: anywhere; }
+.references li:target { background: var(--chip); outline: 2px solid var(--accent); }
+.page-toc { border: 1px solid var(--border); border-radius: 6px; padding: .55rem .9rem;
+  margin: 1.25rem 0 1.75rem; background: var(--chip); font-size: .9rem; }
+.page-toc-title { margin: 0 0 .3rem; font-size: .72rem; text-transform: uppercase;
+  letter-spacing: .05em; color: var(--muted); }
+.page-toc ul { margin: 0; padding-left: 1.15rem; }
+.page-toc ul ul { padding-left: 1rem; }
+.page-toc li { margin: .12rem 0; }
+.sources-toggle { margin: .2rem 0; }
+.sources-toggle > summary { cursor: pointer; color: var(--muted); }
+.sources-toggle > summary:hover { color: var(--fg); }
+.sources-body { margin-top: .35rem; }
+.subconcepts-toggle { font-size: .92rem; color: var(--muted); margin: 0 0 1.6rem; }
+.subconcepts-toggle > summary { cursor: pointer; }
+.subconcepts-body { margin-top: .4rem; }
+
+/* responsive: off-canvas sidebar */
+@media (max-width: 900px) {
+  .content { padding: 40px 24px 100px; max-width: 100%; }
+}
+@media (max-width: 760px) {
+  .nav-toggle { display: block; position: fixed; top: 14px; left: 14px; z-index: 40;
+    background: var(--sidebar-bg); color: var(--sidebar-ink); border: none;
+    border-radius: 20px; padding: 10px 16px; font-family: "Helvetica Neue", Arial, sans-serif;
+    font-size: .85rem; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25); }
+  .shell { display: block; }
+  .sidebar { position: fixed; top: 0; left: 0; height: 100vh; z-index: 30;
+    transform: translateX(-100%); transition: transform .2s ease;
+    box-shadow: 4px 0 24px rgba(0, 0, 0, 0.3); }
+  .sidebar.open { transform: translateX(0); }
+  .content { padding: 84px 20px 100px; }
+}
+
+/* print */
+@media print {
+  .sidebar, .nav-toggle { display: none; }
+  .shell { display: block; }
+  .content { padding: 0; max-width: 100%; }
+}
+
+/* reduced motion (FR-OB-14.3) */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  * { transition: none !important; animation: none !important; }
+}
+
+/* FR-MH-5.1: parent_relation typed-edge chip + reading sub-line (md->html reverse builder) */
+.edge { display: inline-block; margin-left: .5em; padding: 0 .55em; border-radius: 999px;
+  border: 1px solid var(--border); background: var(--chip); color: var(--muted);
+  font-size: .72rem; white-space: nowrap; vertical-align: baseline; }
+.edge-taxonomic { border-color: #6b7fd7; color: #4a5fc0; }
+.edge-evaluative { border-color: #d78f6b; color: #b5673f; }
+.edge-attributive { border-color: #6bb2d7; color: #3f86b5; }
+.edge-compositional { border-color: #7ac07a; color: #4a9a4a; }
+.edge-causal { border-color: #c07a9a; color: #a04a72; }
+.edge-reading { font-size: .8rem; color: var(--muted); font-style: italic; margin-top: .15rem; }
+
+/* FR-MH-17: per-page under-construction badge (md->html reverse builder) */
+#uc-banner{position:fixed;top:14px;right:14px;z-index:100000;display:inline-flex;align-items:center;
+  gap:.45em;padding:.5em .9em;background:#ffcf33;color:#1a1a1a;border:2px solid #1a1a1a;border-radius:10px;
+  font:700 .82rem/1 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;letter-spacing:.03em;
+  text-transform:uppercase;box-shadow:0 3px 12px rgba(0,0,0,.28);pointer-events:none;user-select:none}
+@media (prefers-reduced-motion:no-preference){#uc-banner{animation:uc-bob 1.8s ease-in-out infinite}
+  @keyframes uc-bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-2px)}}}
+@media (max-width:760px){#uc-banner{top:10px;right:10px;font-size:.72rem;padding:.4em .7em}}
+</style>
+</head>
+<body>
+<!-- Generated by output-builder 1.0 from corpus: /Users/igor/dev/llm/ak-llm-wiki/llm-wiki-tools/hierarchy_v2/15-concept-reviewer-pages -->
+<a class="skip-link" href="#content">Skip to content</a>
+<button id="navToggle" class="nav-toggle" aria-label="Toggle navigation" aria-controls="sidebar" aria-expanded="false">&#9776; Concepts</button>
+<div class="shell">
+<nav class="sidebar" id="sidebar" aria-label="Concept hierarchy">
+<div class="sidebar-head">
+<p class="brand-kicker">Wiki</p>
+<p class="brand-title">Concepts</p>
+<p class="brand-count">1 concepts</p>
+</div>
+<input id="filter" class="sidebar-filter" type="search" aria-label="Filter concepts by title, tag, or alias" placeholder="Filter concepts…">
+<ul class="tree" id="tree"></ul>
+</nav>
+<main class="content" id="content" tabindex="-1">
+<nav aria-label="Breadcrumb"><a href="index.html">&larr; All concepts</a></nav>
+<article><h1>Concrete Materials &amp; Mixtures</h1>
+<div class="meta"><div><a class="tag" href="index.html?q=aggregate">aggregate</a><a class="tag" href="index.html?q=concrete-materials">concrete-materials</a><a class="tag" href="index.html?q=fiber-reinforced-concrete">fiber-reinforced-concrete</a><a class="tag" href="index.html?q=hydration">hydration</a><a class="tag" href="index.html?q=mix-design">mix-design</a><a class="tag" href="index.html?q=workability">workability</a></div><div>Also known as: <a href="index.html?q=Cementitious%20Materials">Cementitious Materials</a>, <a href="index.html?q=Concrete%20Mix%20Design%20and%20Rheology">Concrete Mix Design and Rheology</a>, <a href="index.html?q=Fiber-Reinforced%20Concrete%20Mixtures">Fiber-Reinforced Concrete Mixtures</a>, <a href="index.html?q=Supplementary%20Cementitious%20Materials%20%28SCM%29">Supplementary Cementitious Materials (SCM)</a></div><div>Created 2026-07-28 · Updated 2026-08-13</div></div>
+<p>Concrete materials and mixtures constitute a composite construction system primarily composed of cementitious binders, aggregates, water, and chemical admixtures that interact to form a durable structural material. The mechanical strength and durability of the hardened matrix are fundamentally governed by the hydration process, an exothermic chemical reaction where cementitious materials react with water to form binding phases that dictate long-term performance [<sup><a href="#ref-26" aria-label="Reference 26">26</a></sup>] [<sup><a href="#ref-29" aria-label="Reference 29">29</a></sup>] [<sup><a href="#ref-34" aria-label="Reference 34">34</a></sup>] [<sup><a href="#ref-38" aria-label="Reference 38">38</a></sup>]. Supplementary cementitious materials function as finely divided substances that supplement portland cement paste to enhance properties such as long-term strength and chemical resistance through pozzolanic reactions or inherent hydration [<sup><a href="#ref-15" aria-label="Reference 15">15</a></sup>] [<sup><a href="#ref-34" aria-label="Reference 34">34</a></sup>]. Fiber-reinforced concrete incorporates discrete fibers distributed throughout the matrix to provide tensile reinforcement via crack bridging, thereby mitigating brittleness and enhancing post-crack ductility [<sup><a href="#ref-33" aria-label="Reference 33">33</a></sup>] [<sup><a href="#ref-40" aria-label="Reference 40">40</a></sup>]. Fresh concrete workability and mixing ensure the uniform distribution of constituents to achieve desired consistency, while specialized mixtures such as self-consolidating or roller-compacted concrete employ specific rheological balances and compaction methods to meet distinct placement requirements [<sup><a href="#ref-5" aria-label="Reference 5">5</a></sup>] [<sup><a href="#ref-17" aria-label="Reference 17">17</a></sup>] [<sup><a href="#ref-19" aria-label="Reference 19">19</a></sup>].</p>
+
+
+<details class="sources-toggle"><summary>Sources (41)</summary><div class="sources-body"><a href="#ref-1">Carbonate Aggregate in Concrete (2015)</a>, <a href="#ref-2">Calibrating the Iowa Pore Index with Mercury Intrusion Porosimetry and Petrography — Phase II (2019)</a>, <a href="#ref-3">Guide Specification for Internally Curing Concrete (TPF-5(286)) (2017)</a>, <a href="#ref-4">A Technology Deployment Plan for the Use of Recycled Concrete Aggregates in Concrete Paving Mixtures (2011)</a>, <a href="#ref-5">Improving PCC Mix Consistency and Production Rate through Two-Stage Mixing (TR-505, Proj. 11) (2007)</a>, <a href="#ref-6">Feasibility Study of 3D Printing of Concrete for Transportation Infrastructure (TR-756) (2020)</a>, <a href="#ref-7">Improving Variability and Precision of Air-Void Analyzer (AVA) Test Results ..., Phase I (2008)</a>, <a href="#ref-8">An Integrated Study of Pervious Concrete Mixture Design for Wearing Course Applications (2011)</a>, <a href="#ref-9">Pervious Concrete Physical Characteristics and Effectiveness in Stormwater Pollution Reduction (2016)</a>, <a href="#ref-10">Evaluation of Modified Concrete Mixture Proportions for the City of West Des Moines (2016)</a>, <a href="#ref-11">Advancing Electrically Heated Pavements for Sustainable Winter Maintenance (InTrans 24-882) (2024)</a>, <a href="#ref-12">Superabsorbent Polymer in Concrete to Improve Durability (TR-793) (2025)</a>, <a href="#ref-13">Impacts of Internally Cured Concrete Paving on Contraction Joint Spacing Phase II (TR-746) (2021)</a>, <a href="#ref-14">Evaluation and Testing of a Lightweight Fine Aggregate Concrete Bridge Deck in Buchanan County, Iowa (2016)</a>, <a href="#ref-15">Development of Performance Properties of Ternary Mixes: Scoping Study (Phase 1) (2004)</a>, <a href="#ref-16">Deicer Scaling Resistance ... Containing Slag Cement, Phase 1: Site Selection and Analysis of Field Cores (2008)</a>, <a href="#ref-17">Self-Consolidating Concrete—Applications for Slip-Form Paving: Phase II (2011)</a>, <a href="#ref-18">Long-Term Plan for Concrete Pavement Research and Technology—The Concrete Pavement Road Map (Second Generation): Volume II, Tracks (FHWA-HRT-11-070) (2012)</a>, <a href="#ref-19">Use of Chemical Admixtures in Roller-Compacted Concrete for Pavements (2013)</a>, <a href="#ref-20">Evaluation of U.S. and European Concrete Pavement Noise Reduction Methods (2006)</a>, <a href="#ref-21">Defining the Attributes of Good In-Service Portland Cement Concrete Pavements (Proj. 9) (2004)</a>, <a href="#ref-22">Investigation into Freezing-Thawing Durability of Low-Permeability Concrete with and without Air Entraining Agent (2009)</a>, <a href="#ref-23">Investigation of Deterioration of Joints in Concrete Pavements (Field Study; TPF-5(224)) (2012)</a>, <a href="#ref-24">Concrete Pavement MDA: Application of a Portable X-Ray Fluorescence Technique to Assess Concrete Mix Proportions (2012)</a>, <a href="#ref-25">Material and Construction Optimization for Prevention of Premature Pavement Distress in PCC Pavements (2008)</a>, <a href="#ref-26">Developing a Simple and Rapid Test for Monitoring the Heat Evolution of Concrete Mixtures (Phase 3) (2006)</a>, <a href="#ref-27">Impact of Curling, Warping, and Other Early-Age Behavior on Concrete Pavement Smoothness: EFD Study (Phase I) (2005)</a>, <a href="#ref-28">Comparison of Setting Time Measured Using Ultrasonic Wave Propagation with Saw-Cutting Times on Pavements (2015)</a>, <a href="#ref-29">Development of Performance Properties of Ternary Mixes, Phase 1 (2007)</a>, <a href="#ref-30">Deicer Scaling Resistance of Concrete Mixtures Containing Slag Cement, Phase 2 (2012)</a>, <a href="#ref-31">Deicer Scaling Resistance of Concrete Mixtures Containing Slag Cement, Phase 3 (2014)</a>, <a href="#ref-32">Task 4: Testing Iowa PCC Mixtures for the AASHTO Mechanistic-Empirical Pavement Design Procedure (2008)</a>, <a href="#ref-33">Field Performance of Fiber-Reinforced Concrete Overlays (TR-816) (2025)</a>, <a href="#ref-34">Simple and Rapid Test for Monitoring the Heat Evolution of Concrete Mixtures, Phase 2 (2007)</a>, <a href="#ref-35">Development of a Wireless MEMS Multifunction Sensor System and Field Demonstration of Embedded Sensors for Monitoring Concrete Pavements, Volume I (2016)</a>, <a href="#ref-36">Simple and Rapid Test for Monitoring the Heat Evolution ..., Phase III (2008)</a>, <a href="#ref-37">Impact of Curling and Warping on Concrete Pavement (Phase I, TR-668) (2016)</a>, <a href="#ref-38">Optimizing Cementitious Content in Concrete Mixtures for Required Performance (2012)</a>, <a href="#ref-39">Development of Performance Properties of Ternary Mixtures: Field Demonstrations and Project Summary (2012)</a>, <a href="#ref-40">Fiber-Reinforced Concrete for Bridge Decks (TR-767) (2021)</a>, <a href="#ref-41">Concrete Overlay Performance on Iowa&#x27;s Roadways (Field Data Report) (2017)</a></div></details>
+
+<h2 id="key-findings">Key findings</h2>
+<ul>
+<li>Internal curing using lightweight fine aggregate or superabsorbent polymers mitigated autogenous and plastic shrinkage cracking while enhancing the degree of hydration, improving long-term durability and extending predicted service life [<sup><a href="#ref-3" aria-label="Reference 3">3</a></sup>] [<sup><a href="#ref-12" aria-label="Reference 12">12</a></sup>] [<sup><a href="#ref-14" aria-label="Reference 14">14</a></sup>].</li>
+<li>Ternary mixtures utilizing supplementary cementitious materials such as fly ash, slag, silica fume, and metakaolin demonstrated excellent long-term compressive strength potential and durability, with performance heavily influenced by bulk chemistry and allowing for significant reductions in portland cement content [<sup><a href="#ref-29" aria-label="Reference 29">29</a></sup>] [<sup><a href="#ref-39" aria-label="Reference 39">39</a></sup>].</li>
+<li>Construction-related issues such as retempering and elevated water-cementitious ratios exerted a greater negative influence on deicer scaling performance than the inclusion of slag cement or other supplementary materials in the mixture [<sup><a href="#ref-16" aria-label="Reference 16">16</a></sup>] [<sup><a href="#ref-31" aria-label="Reference 31">31</a></sup>].</li>
+<li>Isothermal calorimetry effectively differentiated heat evolution among mortars with varying cement types and supplementary materials, enabling the prediction of set time, early-age strength, and material incompatibilities for quality control [<sup><a href="#ref-34" aria-label="Reference 34">34</a></sup>] [<sup><a href="#ref-36" aria-label="Reference 36">36</a></sup>].</li>
+<li>Two-stage mixing produced concrete with superior homogeneity, increased tensile strength, and greater resistance to chloride penetration compared to conventional ready-mixed methods, yielding higher compressive strengths despite challenges with air entrainment [<sup><a href="#ref-5" aria-label="Reference 5">5</a></sup>].</li>
+<li>Reducing the water-to-cementitious ratio significantly decreased deicer scaling susceptibility, with lower ratios allowing mixtures to pass mass loss requirements regardless of slag content or test method [<sup><a href="#ref-30" aria-label="Reference 30">30</a></sup>].</li>
+<li>Optimizing binder content involved balancing the critical paste volume needed for consolidation against durability penalties, as increasing cementitious content beyond the threshold for workability directly increased chloride penetrability and air permeability [<sup><a href="#ref-38" aria-label="Reference 38">38</a></sup>].</li>
+</ul>
+<section class="references" aria-labelledby="references-heading">
+<h2 id="references-heading">References</h2>
+<ol>
+<li id="ref-1">F. Bektas, K. Wang, and J. Ren, &quot;Carbonate Aggregate in Concrete,&quot; Institute for Transportation, Ames, IA, 2015. [Online]. Available: <a href="https://www.intrans.iastate.edu/wp-content/uploads/2018/03/201514.pdf" rel="noopener noreferrer" target="_blank">https://www.intrans.iastate.edu/wp-content/uploads/2018/03/201514.pdf</a></li><li id="ref-2">J. F. Orso, IV and F. Hasiuk, &quot;Calibrating the Iowa Pore Index with Mercury Intrusion Porosimetry and Petrography — Phase II,&quot; Geological and Atmospheric Sciences, Ames, IA, Rep. InTrans Project 15-553, 2019. [Online]. Available: <a href="https://www.cptechcenter.org/wp-content/uploads/2019/10/calibrating_Iowa_pore_index_phase_II_w_cvr.pdf" rel="noopener noreferrer" target="_blank">https://www.cptechcenter.org/wp-content/uploads/2019/10/calibrating_Iowa_pore_index_phase_II_w_cvr.pdf</a></li><li id="ref-3">W. J. Weiss and L. Montanari, &quot;Guide Specification for Internally Curing Concrete,&quot; National Concrete Pavement Technology Center, Ames, IA, Rep. TPF-5(286), 2017. [Online]. Available: <a href="https://www.intrans.iastate.edu/wp-content/uploads/2018/09/IC_guide_spec_w_cvr.pdf" rel="noopener noreferrer" target="_blank">https://www.intrans.iastate.edu/wp-content/uploads/2018/09/IC_guide_spec_w_cvr.pdf</a></li><li id="ref-4">S. Garber, R. Rasmussen, T. Cackler, P. Taylor, D. Harrington, G. Fick, M. Snyder, T. Van Dam, and C. Lobo, &quot;A Technology Deployment Plan for the Use of Recycled Concrete Aggregates in Concrete Paving Mixtures,&quot; National Concrete Pavement Technology Center, Ames, IA, 2011. [Online]. Available: <a href="https://www.intrans.iastate.edu/wp-content/uploads/2018/03/RCA-Draft-Report_final-ssc.pdf" rel="noopener noreferrer" target="_blank">https://www.intrans.iastate.edu/wp-content/uploads/2018/03/RCA-Draft-Report_final-ssc.pdf</a></li><li id="ref-5">T. D. Rupnow, V. R. Schaefer, K. Wang, and B. L. Hermanson, &quot;Improving PCC Mix Consistency and Production Rate through Two-Stage Mixing,&quot; Center for Transportation Research and Education, Ames, IA, Rep. TR-505, 2007. [Online]. Available: <a href="https://www.intrans.iastate.edu/wp-content/uploads/2018/03/two-stage-mix-1.pdf" rel="noopener noreferrer" target="_blank">https://www.intrans.iastate.edu/wp-content/uploads/2018/03/two-stage-mix-1.pdf</a></li><li id="ref-6">K. Wang, K. Wi, S. Laflamme, S. Sritharan, P. Taylor, and H. Qin, &quot;Feasibility Study of 3D Printing of Concrete for Transportation Infrastructure,&quot; Institute for Transportation, Iowa State University, Ames, IA, Rep. TR-756, 2020. [Online]. Available: <a href="https://intrans.iastate.edu/app/uploads/2020/10/concrete_transportation_infrastructure_3D_printing_feasibility_w_cvr.pdf" rel="noopener noreferrer" target="_blank">https://intrans.iastate.edu/app/uploads/2020/10/concrete_transportation_infrastructure_3D_printing_feasibility_w_cvr.pdf</a></li><li id="ref-7">K. Wang, M. Mohamed-Metwally, F. Bektas, and J. Grove, &quot;Improving Variability and Precision of Air-Void Analyzer (AVA) Test Results ..., Phase I,&quot; Center for Transportation Research and Education, Ames, IA, 2008. [Online]. Available: <a href="https://www.cptechcenter.org/wp-content/uploads/2018/03/ava-1.pdf" rel="noopener noreferrer" target="_blank">https://www.cptechcenter.org/wp-content/uploads/2018/03/ava-1.pdf</a></li><li id="ref-8">V. R. Schaefer and J. T. Kevern, &quot;An Integrated Study of Pervious Concrete Mixture Design for Wearing Course Applications,&quot; National Concrete Pavement Technology Center, Ames, IA, 2011. [Online]. Available: <a href="https://www.intrans.iastate.edu/wp-content/uploads/2018/03/pervious_overlay_report_w_cvr.pdf" rel="noopener noreferrer" target="_blank">https://www.intrans.iastate.edu/wp-content/uploads/2018/03/pervious_overlay_report_w_cvr.pdf</a></li><li id="ref-9">S. K. Ong, K. Wang, Y. Ling, and G. Shi, &quot;Pervious Concrete Physical Characteristics and Effectiveness in Stormwater Pollution Reduction,&quot; Institute for Transportation, Ames, IA, Rep. DTRT13-G-UTC37, 2016. [Online]. Available: <a href="https://www.intrans.iastate.edu/wp-content/uploads/2018/03/pervious_concrete_in_stormwater_pollution_reduction_w_cvr.pdf" rel="noopener noreferrer" target="_blank">https://www.intrans.iastate.edu/wp-content/uploads/2018/03/pervious_concrete_in_stormwater_pollution_reduction_w_cvr.pdf</a></li><li id="ref-10">X. Wang, P. Taylor, and D. King, &quot;Evaluation of Modified Concrete Mixture Proportions for the City of West Des Moines,&quot; National Concrete Pavement Technology Center, Ames, IA, 2016. [Online]. Available: <a href="https://www.intrans.iastate.edu/wp-content/uploads/2018/03/WDM_modified_concrete_mixture_proportions_w_cvr.pdf" rel="noopener noreferrer" target="_blank">https://www.intrans.iastate.edu/wp-content/uploads/2018/03/WDM_modified_concrete_mixture_proportions_w_cvr.pdf</a></li><li id="ref-11">M. L. Rahman, H. Ceylan, S. Kim, P. C. Taylor, and D. King, &quot;Advancing Electrically Heated Pavements for Sustainable Winter Maintenance,&quot; PROSPER and National Concrete Pavement Technology Center, Iowa State University, Ames, IA, Rep. HR-3049, 2024. [Online]. Available: <a href="https://www.intrans.iastate.edu/wp-content/uploads/2025/03/electrically_heated_pavements_for_sustainable_winter_maintenance_w_cvr.pdf" rel="noopener noreferrer" target="_blank">https://www.intrans.iastate.edu/wp-content/uploads/2025/03/electrically_heated_pavements_for_sustainable_winter_maintenance_w_cvr.pdf</a></li><li id="ref-12">B. Zhou, P. Taylor, and K. Wang, &quot;Superabsorbent Polymer in Concrete to Improve Durability,&quot; National Concrete Pavement Technology Center, Iowa State University, Ames, IA, Rep. TR-793, 2025. [Online]. Available: <a href="https://www.intrans.iastate.edu/wp-content/uploads/2025/04/superabsorbent_polymer_in_concrete_w_cvr.pdf" rel="noopener noreferrer" target="_blank">https://www.intrans.iastate.edu/wp-content/uploads/2025/04/superabsorbent_polymer_in_concrete_w_cvr.pdf</a></li><li id="ref-13">A. Daghighi, P. Taylor, H. Ceylan, and Y. Zhang, &quot;Impacts of Internally Cured Concrete Paving on Contraction Joint Spacing Phase II,&quot; National Concrete Pavement Technology Center, Iowa State University, Ames, IA, Rep. TR-746, 2021. [Online]. Available: <a href="https://www.cptechcenter.org/wp-content/uploads/2021/05/IC_concrete_paving_impacts_phase_II_field_impl_w_cvr.pdf" rel="noopener noreferrer" target="_blank">https://www.cptechcenter.org/wp-content/uploads/2021/05/IC_concrete_paving_impacts_phase_II_field_impl_w_cvr.pdf</a></li><li id="ref-14">P. Taylor, T. Hosteng, X. Wang, and B. Phares, &quot;Evaluation and Testing of a Lightweight Fine Aggregate Concrete Bridge Deck in Buchanan County, Iowa,&quot; National Concrete Pavement Technology Center and Bridge Engineering Center, Ames, IA, Rep. TR-648, 2016. [Online]. Available: <a href="https://www.intrans.iastate.edu/wp-content/uploads/2018/03/Buchanan_LWFA_bridge_deck_w_cvr.pdf" rel="noopener noreferrer" target="_blank">https://www.intrans.iastate.edu/wp-content/uploads/2018/03/Buchanan_LWFA_bridge_deck_w_cvr.pdf</a></li><li id="ref-15">S. Schlorholtz, &quot;Development of Performance Properties of Ternary Mixes: Scoping Study (Phase 1),&quot; Center for Portland Cement Concrete Pavement Technology, Iowa State University, Ames, IA, Rep. DTFH61-01-X-00042 (Project 13), 2004. [Online]. Available: <a href="https://www.cptechcenter.org/wp-content/uploads/2018/03/ternary_mixes.pdf" rel="noopener noreferrer" target="_blank">https://www.cptechcenter.org/wp-content/uploads/2018/03/ternary_mixes.pdf</a></li><li id="ref-16">S. Schlorholtz and R. D. Hooton, &quot;Deicer Scaling Resistance ... Containing Slag Cement, Phase 1: Site Selection and Analysis of Field Cores,&quot; National Concrete Pavement Technology Center, Ames, IA, Rep. TPF-5(100), 2008. [Online]. Available: <a href="https://www.cptechcenter.org/wp-content/uploads/2018/03/schlorholtz_deicing_phase1.pdf" rel="noopener noreferrer" target="_blank">https://www.cptechcenter.org/wp-content/uploads/2018/03/schlorholtz_deicing_phase1.pdf</a></li><li id="ref-17">K. Wang, S. P. Shah, J. Grove, P. Taylor, P. Wiegand, B. Steffes, G. Lomboy, Z. Quanji, L. Gang, and N. Tregger, &quot;Self-Consolidating Concrete—Applications for Slip-Form Paving: Phase II,&quot; National Concrete Pavement Technology Center, Ames, IA, Rep. TPF-5(098), 2011. [Online]. Available: <a href="https://www.intrans.iastate.edu/wp-content/uploads/2018/03/SCC_Phase_2_final_report-edited_wcover.pdf" rel="noopener noreferrer" target="_blank">https://www.intrans.iastate.edu/wp-content/uploads/2018/03/SCC_Phase_2_final_report-edited_wcover.pdf</a></li><li id="ref-18">D. Harrington, R. Rasmussen, D. Merritt, T. Cackler, and P. Taylor, &quot;Long-Term Plan for Concrete Pavement Research and Technology—The Concrete Pavement Road Map (Second Generation): Volume II, Tracks (FHWA-HRT-11-070),&quot; National Center for Concrete Pavement Technology, Iowa State University, Ames, IA, 2012. [Online]. Available: <a href="https://www.fhwa.dot.gov/publications/research/infrastructure/pavements/pccp/11070/11070.pdf" rel="noopener noreferrer" target="_blank">https://www.fhwa.dot.gov/publications/research/infrastructure/pavements/pccp/11070/11070.pdf</a></li><li id="ref-19">C. V. Hazaree, H. Ceylan, P. Taylor, K. Gopalakrishnan, K. Wang, and F. Bektas, &quot;Use of Chemical Admixtures in Roller-Compacted Concrete for Pavements,&quot; National Concrete Pavement Technology Center, Ames, IA, 2013. [Online]. Available: <a href="https://www.intrans.iastate.edu/wp-content/uploads/2018/03/rcc_admixture_w_cvr1.pdf" rel="noopener noreferrer" target="_blank">https://www.intrans.iastate.edu/wp-content/uploads/2018/03/rcc_admixture_w_cvr1.pdf</a></li><li id="ref-20">E. T. Cackler, T. Ferragut, and D. S. Harrington, &quot;Evaluation of U.S. and European Concrete Pavement Noise Reduction Methods,&quot; National Concrete Pavement Technology Center, Iowa State University, Ames, IA, Rep. FHWA Project 15 (DTFH61-01-X-00042), 2006. [Online]. Available: <a href="https://www.cptechcenter.org/wp-content/uploads/2018/03/surface_characteristics_i.pdf" rel="noopener noreferrer" target="_blank">https://www.cptechcenter.org/wp-content/uploads/2018/03/surface_characteristics_i.pdf</a></li><li id="ref-21">J. K. Cable and H. Ceylan, &quot;Defining the Attributes of Good In-Service Portland Cement Concrete Pavements,&quot; Center for Portland Cement Concrete Pavement Technology, Iowa State University, Ames, IA, Rep. DTFH61-01-X-00042 (Project 9), 2004. [Online]. Available: <a href="https://www.intrans.iastate.edu/wp-content/uploads/2018/03/pavement_attributes.pdf" rel="noopener noreferrer" target="_blank">https://www.intrans.iastate.edu/wp-content/uploads/2018/03/pavement_attributes.pdf</a></li><li id="ref-22">K. Wang, G. Lomboy, and R. Steffes, &quot;Investigation into Freezing-Thawing Durability of Low-Permeability Concrete with and without Air Entraining Agent,&quot; National Concrete Pavement Technology Center, Ames, IA, 2009. [Online]. Available: <a href="https://www.intrans.iastate.edu/wp-content/uploads/2018/03/low-permeability-concrete.pdf" rel="noopener noreferrer" target="_blank">https://www.intrans.iastate.edu/wp-content/uploads/2018/03/low-permeability-concrete.pdf</a></li><li id="ref-23">P. Taylor, L. Sutter, and J. Weiss, &quot;Investigation of Deterioration of Joints in Concrete Pavements,&quot; National Concrete Pavement Technology Center, Ames, IA, Rep. TPF-5(224), 2012. [Online]. Available: <a href="https://www.intrans.iastate.edu/wp-content/uploads/2018/03/joint_deterioration_penetrating_sealers_field_study_w_cvr.pdf" rel="noopener noreferrer" target="_blank">https://www.intrans.iastate.edu/wp-content/uploads/2018/03/joint_deterioration_penetrating_sealers_field_study_w_cvr.pdf</a></li><li id="ref-24">P. C. Taylor, E. Yurdakul, and H. Ceylan, &quot;Concrete Pavement MDA: Application of a Portable X-Ray Fluorescence Technique to Assess Concrete Mix Proportions,&quot; National Concrete Pavement Technology Center, Ames, IA, Rep. TPF-5(205), 2012. [Online]. Available: <a href="https://www.intrans.iastate.edu/research/completed/concrete-pavement-mixture-design-and-analysis/" rel="noopener noreferrer" target="_blank">https://www.intrans.iastate.edu/research/completed/concrete-pavement-mixture-design-and-analysis/</a></li><li id="ref-25">J. Grove, G. Fick, T. Rupnow, and F. Bektas, &quot;Material and Construction Optimization for Prevention of Premature Pavement Distress in PCC Pavements,&quot; National Concrete Pavement Technology Center, Ames, IA, Rep. TPF-5(066), 2008. [Online]. Available: <a href="https://www.intrans.iastate.edu/wp-content/uploads/2018/03/mco-final.pdf" rel="noopener noreferrer" target="_blank">https://www.intrans.iastate.edu/wp-content/uploads/2018/03/mco-final.pdf</a></li><li id="ref-26">K. Wang, Z. Ge, J. Grove, J. M. Ruiz, and R. Rasmussen, &quot;Developing a Simple and Rapid Test for Monitoring the Heat Evolution of Concrete Mixtures (Phase 3),&quot; CTRE, Iowa State University, Ames, IA, Rep. FHWA Project 17 (Phase I), 2006. [Online]. Available: <a href="https://www.intrans.iastate.edu/wp-content/uploads/2018/03/CalorimeterReportPhaseIII.pdf" rel="noopener noreferrer" target="_blank">https://www.intrans.iastate.edu/wp-content/uploads/2018/03/CalorimeterReportPhaseIII.pdf</a></li><li id="ref-27">H. Ceylan, D. J. Turner, R. O. Rasmussen, G. K. Chang, J. Grove, S. Kim, and C. S. Reddy, &quot;Impact of Curling, Warping, and Other Early-Age Behavior on Concrete Pavement Smoothness: EFD Study (Phase I),&quot; Center for Transportation Research and Education, Iowa State University, Ames, IA, Rep. DTFH61-01-X-00042 (Project 16), 2005. [Online]. Available: <a href="https://www.intrans.iastate.edu/wp-content/uploads/2018/03/curling_warping-2.pdf" rel="noopener noreferrer" target="_blank">https://www.intrans.iastate.edu/wp-content/uploads/2018/03/curling_warping-2.pdf</a></li><li id="ref-28">P. Taylor and X. Wang, &quot;Comparison of Setting Time Measured Using Ultrasonic Wave Propagation with Saw-Cutting Times on Pavements,&quot; National Concrete Pavement Technology Center, Ames, IA, Rep. TR-675, 2015. [Online]. Available: <a href="https://www.intrans.iastate.edu/wp-content/uploads/2018/03/PCC_setting_time_and_joint_sawing_w_cvr.pdf" rel="noopener noreferrer" target="_blank">https://www.intrans.iastate.edu/wp-content/uploads/2018/03/PCC_setting_time_and_joint_sawing_w_cvr.pdf</a></li><li id="ref-29">P. Tikalsky, V. Schaefer, K. Wang, B. Scheetz, T. Rupnow, A. St. Clair, M. Siddiqi, and S. Marquez, &quot;Development of Performance Properties of Ternary Mixes, Phase 1,&quot; Center for Transportation Research and Education, Ames, IA, Rep. TPF-5(117), 2007. [Online]. Available: <a href="https://www.intrans.iastate.edu/research/completed/development-of-performance-properties-of-ternary-mixes-phase-1/" rel="noopener noreferrer" target="_blank">https://www.intrans.iastate.edu/research/completed/development-of-performance-properties-of-ternary-mixes-phase-1/</a></li><li id="ref-30">R. D. Hooton and D. Vassilev, &quot;Deicer Scaling Resistance of Concrete Mixtures Containing Slag Cement, Phase 2,&quot; National Concrete Pavement Technology Center, Ames, IA, Rep. TPF-5(100), 2012. [Online]. Available: <a href="https://www.intrans.iastate.edu/research/completed/deicer-scaling-resistance-of-concrete-pavements-bridge-decks-and-other-structures-containing-slag-cement-phase-2-evaluation-of-different-laboratory-scaling-test-methods/" rel="noopener noreferrer" target="_blank">https://www.intrans.iastate.edu/research/completed/deicer-scaling-resistance-of-concrete-pavements-bridge-decks-and-other-structures-containing-slag-cement-phase-2-evaluation-of-different-laboratory-scaling-test-methods/</a></li><li id="ref-31">P. Taylor and X. Wang, &quot;Deicer Scaling Resistance of Concrete Mixtures Containing Slag Cement, Phase 3,&quot; National Concrete Pavement Technology Center, Ames, IA, Rep. TPF-5(100), 2014. [Online]. Available: <a href="https://www.intrans.iastate.edu/wp-content/uploads/2018/03/deicer_scaling_w_cvr.pdf" rel="noopener noreferrer" target="_blank">https://www.intrans.iastate.edu/wp-content/uploads/2018/03/deicer_scaling_w_cvr.pdf</a></li><li id="ref-32">K. Wang, J. Hu, and Z. Ge, &quot;Task 4: Testing Iowa PCC Mixtures for the AASHTO Mechanistic-Empirical Pavement Design Procedure,&quot; Center for Transportation Research and Education, Ames, IA, Rep. CTRE 06-270, 2008. [Online]. Available: <a href="https://www.intrans.iastate.edu/research/completed/testing-iowa-portland-cement-concrete-mixtures-for-the-mechanistic-empirical-pavement-design-guide/" rel="noopener noreferrer" target="_blank">https://www.intrans.iastate.edu/research/completed/testing-iowa-portland-cement-concrete-mixtures-for-the-mechanistic-empirical-pavement-design-guide/</a></li><li id="ref-33">D. King, B. Yang, P. Taylor, and H. Ceylan, &quot;Field Performance of Fiber-Reinforced Concrete Overlays,&quot; Institute for Transportation, Iowa State University, Ames, IA, Rep. TR-816, 2025. [Online]. Available: <a href="https://www.intrans.iastate.edu/wp-content/uploads/2025/05/field_performance_of_frc_overlays_w_cvr.pdf" rel="noopener noreferrer" target="_blank">https://www.intrans.iastate.edu/wp-content/uploads/2025/05/field_performance_of_frc_overlays_w_cvr.pdf</a></li><li id="ref-34">K. Wang, Z. Ge, J. Grove, J. M. Ruiz, R. Rasmussen, and T. Ferragut, &quot;Simple and Rapid Test for Monitoring the Heat Evolution of Concrete Mixtures, Phase 2,&quot; Center for Transportation Research and Education, Ames, IA, 2007. [Online]. Available: <a href="https://www.intrans.iastate.edu/wp-content/uploads/2018/03/calorimeter.pdf" rel="noopener noreferrer" target="_blank">https://www.intrans.iastate.edu/wp-content/uploads/2018/03/calorimeter.pdf</a></li><li id="ref-35">H. Ceylan, L. Dong, S. Yang, Y. Jiao, S. Yavas, S. Kim, K. Gopalakrishnan, and P. Taylor, &quot;Development of a Wireless MEMS Multifunction Sensor System and Field Demonstration of Embedded Sensors for Monitoring Concrete Pavements, Volume I,&quot; Institute for Transportation, Ames, IA, Rep. TR-637, 2016. [Online]. Available: <a href="https://prosper.intrans.iastate.edu/wp-content/uploads/2018/03/wireless_MEMS_volume_I_field_demo_w_cvr.pdf" rel="noopener noreferrer" target="_blank">https://prosper.intrans.iastate.edu/wp-content/uploads/2018/03/wireless_MEMS_volume_I_field_demo_w_cvr.pdf</a></li><li id="ref-36">K. Wang, J. M. Ruiz, J. Hu, Z. Ge, Q. Xu, J. Grove, and R. Rasmussen, &quot;Simple and Rapid Test for Monitoring the Heat Evolution ..., Phase III,&quot; National Concrete Pavement Technology Center, Ames, IA, 2008. [Online]. Available: <a href="https://www.intrans.iastate.edu/wp-content/uploads/2018/03/CalorimeterReportPhaseIII.pdf" rel="noopener noreferrer" target="_blank">https://www.intrans.iastate.edu/wp-content/uploads/2018/03/CalorimeterReportPhaseIII.pdf</a></li><li id="ref-37">H. Ceylan, S. Yang, K. Gopalakrishnan, S. Kim, P. Taylor, and A. Alhasan, &quot;Impact of Curling and Warping on Concrete Pavement,&quot; Institute for Transportation, Ames, IA, Rep. TR-668, 2016. [Online]. Available: <a href="https://www.intrans.iastate.edu/wp-content/uploads/2018/03/curling_and_warping_impact_on_concrete_pvmt_w_cvr.pdf" rel="noopener noreferrer" target="_blank">https://www.intrans.iastate.edu/wp-content/uploads/2018/03/curling_and_warping_impact_on_concrete_pvmt_w_cvr.pdf</a></li><li id="ref-38">P. Taylor, F. Bektas, E. Yurdakul, and H. Ceylan, &quot;Optimizing Cementitious Content in Concrete Mixtures for Required Performance,&quot; National Concrete Pavement Technology Center, Ames, IA, 2012. [Online]. Available: <a href="https://www.intrans.iastate.edu/wp-content/uploads/2018/03/taylor_ocm_w_cvr2.pdf" rel="noopener noreferrer" target="_blank">https://www.intrans.iastate.edu/wp-content/uploads/2018/03/taylor_ocm_w_cvr2.pdf</a></li><li id="ref-39">P. Taylor, P. Tikalsky, K. Wang, G. Fick, and X. Wang, &quot;Development of Performance Properties of Ternary Mixtures: Field Demonstrations and Project Summary,&quot; National Concrete Pavement Technology Center, Ames, IA, Rep. TPF-5(117), 2012. [Online]. Available: <a href="https://www.intrans.iastate.edu/wp-content/uploads/2018/03/ternary_final_w_cvr.pdf" rel="noopener noreferrer" target="_blank">https://www.intrans.iastate.edu/wp-content/uploads/2018/03/ternary_final_w_cvr.pdf</a></li><li id="ref-40">B. Shafei, P. Taylor, B. Phares, and M. Kazemian, &quot;Fiber-Reinforced Concrete for Bridge Decks,&quot; Bridge Engineering Center, Iowa State University, Ames, IA, Rep. TR-767, 2021. [Online]. Available: <a href="https://www.intrans.iastate.edu/wp-content/uploads/2021/12/fiber-reinforced_concrete_in_bridge_decks_w_cvr.pdf" rel="noopener noreferrer" target="_blank">https://www.intrans.iastate.edu/wp-content/uploads/2021/12/fiber-reinforced_concrete_in_bridge_decks_w_cvr.pdf</a></li><li id="ref-41">J. Gross, D. King, D. Harrington, H. Ceylan, Y. A. Chen, S. Kim, P. Taylor, and O. Kaya, &quot;Concrete Overlay Performance on Iowa&#x27;s Roadways (Field Data Report),&quot; National Concrete Pavement Technology Center, Ames, IA, Rep. TR-698, 2017. [Online]. Available: <a href="https://www.intrans.iastate.edu/wp-content/uploads/2017/09/Iowa_concrete_overlay_performance_w_cvr.pdf" rel="noopener noreferrer" target="_blank">https://www.intrans.iastate.edu/wp-content/uploads/2017/09/Iowa_concrete_overlay_performance_w_cvr.pdf</a></li>
+</ol>
+</section></article>
+<div id="uc-banner" role="status" title="This page is still being built and may change."><span aria-hidden="true">🚧</span> Under construction</div>
+</main>
+</div>
+<script>
+(function () {
+  var toggle = document.getElementById('navToggle');
+  var sidebar = document.getElementById('sidebar');
+  var mobile = window.matchMedia('(max-width: 760px)');
+  function setInert() { if (sidebar) { if (mobile.matches && !sidebar.classList.contains('open')) { sidebar.setAttribute('inert', ''); } else { sidebar.removeAttribute('inert'); } } }
+  setInert();
+  if (mobile.addEventListener) mobile.addEventListener('change', setInert);
+  if (toggle && sidebar) {
+    toggle.addEventListener('click', function () {
+      var open = sidebar.classList.toggle('open');
+      toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+      if (open) {
+        sidebar.removeAttribute('inert');
+        var first = sidebar.querySelector('input, a, summary');
+        if (first) first.focus();
+      } else {
+        setInert();
+        toggle.focus();
+      }
+    });
+    sidebar.addEventListener('click', function (e) {
+      if (e.target.closest('a') && mobile.matches) {
+        sidebar.classList.remove('open');
+        toggle.setAttribute('aria-expanded', 'false');
+        setInert();
+      }
+    });
+  }
+  var filter = document.getElementById('filter');
+  var tree = document.getElementById('tree');
+  if (filter && tree) {
+    var snapshot = new Set();
+    tree.querySelectorAll('details').forEach(function (d) { if (d.hasAttribute('open')) snapshot.add(d); });
+    filter.addEventListener('input', function () {
+      var q = filter.value.trim().toLowerCase();
+      var items = tree.querySelectorAll('li');
+      if (!q) {
+        items.forEach(function (li) { li.hidden = false; });
+        tree.querySelectorAll('details').forEach(function (d) { d.open = snapshot.has(d); });
+        return;
+      }
+      items.forEach(function (li) { li.hidden = true; });
+      tree.querySelectorAll('li > a').forEach(function (a) {
+        if (a.textContent.toLowerCase().indexOf(q) === -1) return;
+        var li = a.parentElement;
+        li.hidden = false;
+        var p = li.parentElement;
+        while (p && p !== tree) {
+          if (p.tagName === 'LI') p.hidden = false;
+          if (p.tagName === 'DETAILS') p.open = true;
+          p = p.parentElement;
+        }
+      });
+    });
+  }
+})();
+</script>
+</body>
+</html>
