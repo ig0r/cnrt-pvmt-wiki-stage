@@ -1,0 +1,460 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lightweight Aggregate</title>
+<style>
+:root {
+  --bg: #ffffff;
+  --fg: #1c1c1c;
+  --ink: #1c1c1c;
+  --muted: #5b6472;
+  --sub: #5b6472;
+  --border: #e4e0da;
+  --line: #e4e0da;
+  --chip: #f1ede6;
+  --code: #f4f4f0;
+  --accent: #7a4a63;
+  --link: #2456c7;
+  --sidebar-bg: #23222a;
+  --sidebar-ink: #eae7e2;
+  --sidebar-sub: #9d97a8;
+  --sidebar-line: rgba(255, 255, 255, 0.1);
+  --sidebar-active: #c98fa8;
+  --sidebar-width: 300px;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body { margin: 0; padding: 0; background: var(--bg); color: var(--fg);
+  font: 16px/1.65 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+
+/* a11y: focus-visible (light content + dark sidebar) + skip link (FR-OB-14.1) */
+:focus-visible { outline: 2px solid var(--link); outline-offset: 2px; }
+.sidebar :focus-visible { outline: 2px solid var(--sidebar-active); outline-offset: 2px; }
+.skip-link { position: absolute; left: -9999px; top: 0; background: var(--bg);
+  color: var(--link); padding: .5rem 1rem; border: 1px solid var(--border); z-index: 100; }
+.skip-link:focus { left: 0; }
+
+/* layout shell (adapted from example/00_table_of_contents.html) */
+.shell { display: flex; min-height: 100vh; }
+.sidebar { position: sticky; top: 0; align-self: flex-start; width: var(--sidebar-width);
+  flex: 0 0 var(--sidebar-width); height: 100vh; overflow-y: auto; background: var(--sidebar-bg);
+  color: var(--sidebar-ink); padding: 28px 20px 40px;
+  font-family: "Helvetica Neue", Arial, sans-serif; }
+.sidebar-head { margin-bottom: 18px; padding-bottom: 16px;
+  border-bottom: 1px solid var(--sidebar-line); }
+.brand-kicker { margin: 0 0 6px; letter-spacing: .14em; text-transform: uppercase;
+  font-size: .72rem; color: var(--sidebar-active); font-weight: 700; }
+.brand-title { margin: 0 0 8px; font-size: 1.1rem; line-height: 1.3; font-weight: 700;
+  color: var(--sidebar-ink); }
+.brand-count { margin: 0; font-size: .8rem; color: var(--sidebar-sub); }
+.sidebar-filter { width: 100%; padding: .5rem .7rem; margin: 0 0 16px; font: inherit;
+  font-size: .85rem; color: var(--sidebar-ink); background: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--sidebar-line); border-radius: 6px; }
+.sidebar-filter::placeholder { color: var(--sidebar-sub); }
+.content { flex: 1 1 auto; min-width: 0; padding: 48px 56px 120px; max-width: none; }
+.nav-toggle { display: none; }
+
+/* sidebar hierarchy tree: native <details>, indent capped for 375px (FR-OB-6.4) */
+.tree, .tree ul { list-style: none; margin: 0; padding: 0; }
+.tree li { padding: 1px 0; }
+.tree ul { margin-left: .3rem; padding-left: .6rem; border-left: 1px solid var(--sidebar-line); }
+.tree a { display: inline-block; color: var(--sidebar-sub); text-decoration: none;
+  padding: 3px 6px; border-radius: 5px; overflow-wrap: break-word; word-break: break-word; }
+.tree a:hover { color: var(--sidebar-ink); background: rgba(255, 255, 255, 0.06); }
+.tree a.active { color: var(--sidebar-ink); font-weight: 700;
+  border-left: 3px solid var(--sidebar-active); padding-left: 6px;
+  background: rgba(201, 143, 168, 0.16); }
+.tree details { display: inline; }
+.tree summary { list-style: none; cursor: pointer; color: var(--sidebar-sub);
+  user-select: none; padding: 0 4px; display: inline-block; }
+.tree summary::-webkit-details-marker { display: none; }
+.tree details[open] > summary { color: var(--sidebar-ink); }
+.tree li[hidden] { display: none; }
+
+/* content typography */
+a { color: var(--link); text-decoration: none; }
+a:hover { text-decoration: underline; }
+h1 { font-size: 1.75rem; line-height: 1.25; margin: .1em 0 .4em;
+  border-bottom: 3px solid var(--accent); padding-bottom: .35em; color: var(--ink); }
+h2 { font-size: 1.25rem; color: var(--accent); margin-top: 2rem; padding-bottom: .3rem;
+  border-bottom: 1px solid var(--border); }
+h3 { font-size: 1.05rem; color: var(--sub); }
+p, li { color: var(--ink); }
+blockquote { margin: 1rem 0; padding: .1rem 1rem; border-left: 3px solid var(--border);
+  color: var(--muted); }
+hr { border: none; border-top: 1px solid var(--border); margin: 2rem 0; }
+code { background: var(--code); padding: .1em .35em; border-radius: 4px; font-size: .9em; }
+pre { background: var(--code); padding: .75rem 1rem; border-radius: 6px; overflow-x: auto; }
+pre code { background: none; padding: 0; }
+
+/* tables: override the example no-op with a scrolling block (FR-OB-5.1) */
+table { display: block; overflow-x: auto; border-collapse: collapse; margin: 1rem 0; }
+div.table-scroll { overflow-x: auto; margin: 1rem 0; }
+th, td { border: 1px solid var(--border); padding: .35rem .65rem; text-align: left; }
+th { background: var(--chip); }
+
+/* images capped to the content column (FR-OB-3.4) */
+img { max-width: 100%; height: auto; display: block; margin: 1rem 0;
+  border: 1px solid var(--border); border-radius: 4px; }
+article img { max-width: 100%; height: auto; }
+figure { margin: 1.4em 0; }
+figcaption { font-size: .86rem; color: var(--sub); margin-top: .5em; font-style: italic; }
+
+/* concept-viewer content classes, retuned to the light content palette */
+nav { margin-bottom: 1.5rem; font-size: .9rem; }
+.muted { color: var(--muted); }
+.meta { margin: .25rem 0 1.75rem; padding-bottom: 1.1rem;
+  border-bottom: 1px solid var(--border); font-size: .85rem; color: var(--muted); }
+.meta div { margin-top: .2rem; }
+.tag { display: inline-block; background: var(--chip); border: 1px solid var(--border);
+  border-radius: 999px; padding: 0 .6em; font-size: .74rem; color: var(--muted);
+  margin: 0 .15rem .15rem 0; white-space: nowrap; }
+a.tag:hover { text-decoration: none; color: var(--fg); border-color: var(--muted); }
+.src { font-size: .78em; color: var(--muted); }
+a.src { color: var(--link); }
+.missing { color: var(--muted); border-bottom: 1px dotted var(--muted); cursor: help; }
+.breadcrumb { color: var(--muted); }
+.breadcrumb a { color: var(--link); }
+.breadcrumb .crumb-sep { margin: 0 .35em; color: var(--muted); }
+.breadcrumb .crumb-current { color: var(--fg); }
+.part-of { color: var(--muted); }
+.part-of::before { content: "\2193 "; }
+.subconcepts { font-size: .92rem; color: var(--muted); margin: 0 0 1.6rem; }
+.subconcepts::before { content: "\25b8 "; }
+
+/* citation rules */
+sup a { text-decoration: none; color: var(--link); }
+.references { margin-top: 2.5rem; font-size: .9rem; }
+.references li { margin: .35rem 0; overflow-wrap: anywhere; }
+.references li:target { background: var(--chip); outline: 2px solid var(--accent); }
+.page-toc { border: 1px solid var(--border); border-radius: 6px; padding: .55rem .9rem;
+  margin: 1.25rem 0 1.75rem; background: var(--chip); font-size: .9rem; }
+.page-toc-title { margin: 0 0 .3rem; font-size: .72rem; text-transform: uppercase;
+  letter-spacing: .05em; color: var(--muted); }
+.page-toc ul { margin: 0; padding-left: 1.15rem; }
+.page-toc ul ul { padding-left: 1rem; }
+.page-toc li { margin: .12rem 0; }
+.sources-toggle { margin: .2rem 0; }
+.sources-toggle > summary { cursor: pointer; color: var(--muted); }
+.sources-toggle > summary:hover { color: var(--fg); }
+.sources-body { margin-top: .35rem; }
+.subconcepts-toggle { font-size: .92rem; color: var(--muted); margin: 0 0 1.6rem; }
+.subconcepts-toggle > summary { cursor: pointer; }
+.subconcepts-body { margin-top: .4rem; }
+
+/* responsive: off-canvas sidebar */
+@media (max-width: 900px) {
+  .content { padding: 40px 24px 100px; max-width: 100%; }
+}
+@media (max-width: 760px) {
+  .nav-toggle { display: block; position: fixed; top: 14px; left: 14px; z-index: 40;
+    background: var(--sidebar-bg); color: var(--sidebar-ink); border: none;
+    border-radius: 20px; padding: 10px 16px; font-family: "Helvetica Neue", Arial, sans-serif;
+    font-size: .85rem; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25); }
+  .shell { display: block; }
+  .sidebar { position: fixed; top: 0; left: 0; height: 100vh; z-index: 30;
+    transform: translateX(-100%); transition: transform .2s ease;
+    box-shadow: 4px 0 24px rgba(0, 0, 0, 0.3); }
+  .sidebar.open { transform: translateX(0); }
+  .content { padding: 84px 20px 100px; }
+}
+
+/* print */
+@media print {
+  .sidebar, .nav-toggle { display: none; }
+  .shell { display: block; }
+  .content { padding: 0; max-width: 100%; }
+}
+
+/* reduced motion (FR-OB-14.3) */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  * { transition: none !important; animation: none !important; }
+}
+
+/* FR-MH-5.1: parent_relation typed-edge chip + reading sub-line (md->html reverse builder) */
+.edge { display: inline-block; margin-left: .5em; padding: 0 .55em; border-radius: 999px;
+  border: 1px solid var(--border); background: var(--chip); color: var(--muted);
+  font-size: .72rem; white-space: nowrap; vertical-align: baseline; }
+.edge-taxonomic { border-color: #6b7fd7; color: #4a5fc0; }
+.edge-evaluative { border-color: #d78f6b; color: #b5673f; }
+.edge-attributive { border-color: #6bb2d7; color: #3f86b5; }
+.edge-compositional { border-color: #7ac07a; color: #4a9a4a; }
+.edge-causal { border-color: #c07a9a; color: #a04a72; }
+.edge-reading { font-size: .8rem; color: var(--muted); font-style: italic; margin-top: .15rem; }
+
+/* FR-MH-17: per-page under-construction badge (md->html reverse builder) */
+#uc-banner{position:fixed;top:14px;right:14px;z-index:100000;display:inline-flex;align-items:center;
+  gap:.45em;padding:.5em .9em;background:#ffcf33;color:#1a1a1a;border:2px solid #1a1a1a;border-radius:10px;
+  font:700 .82rem/1 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;letter-spacing:.03em;
+  text-transform:uppercase;box-shadow:0 3px 12px rgba(0,0,0,.28);pointer-events:none;user-select:none}
+@media (prefers-reduced-motion:no-preference){#uc-banner{animation:uc-bob 1.8s ease-in-out infinite}
+  @keyframes uc-bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-2px)}}}
+@media (max-width:760px){#uc-banner{top:10px;right:10px;font-size:.72rem;padding:.4em .7em}}
+</style>
+</head>
+<body>
+<!-- Generated by output-builder 1.0 from corpus: /Users/igor/dev/llm/ak-llm-wiki/llm-wiki-tools/hierarchy_v2/15-concept-reviewer-pages -->
+<a class="skip-link" href="#content">Skip to content</a>
+<button id="navToggle" class="nav-toggle" aria-label="Toggle navigation" aria-controls="sidebar" aria-expanded="false">&#9776; Concepts</button>
+<div class="shell">
+<nav class="sidebar" id="sidebar" aria-label="Concept hierarchy">
+<div class="sidebar-head">
+<p class="brand-kicker">Wiki</p>
+<p class="brand-title">Concepts</p>
+<p class="brand-count">10 concepts</p>
+</div>
+<input id="filter" class="sidebar-filter" type="search" aria-label="Filter concepts by title, tag, or alias" placeholder="Filter concepts…">
+<ul class="tree" id="tree"></ul>
+</nav>
+<main class="content" id="content" tabindex="-1">
+<nav aria-label="Breadcrumb"><a href="index.html">&larr; All concepts</a></nav>
+<article><h1>Lightweight Aggregate</h1>
+<div class="meta"><div><a class="tag" href="index.html?q=aggregate">aggregate</a><a class="tag" href="index.html?q=concrete-materials">concrete-materials</a><a class="tag" href="index.html?q=density">density</a><a class="tag" href="index.html?q=internal-curing">internal-curing</a></div><div>Also known as: <a href="index.html?q=LWFA">LWFA</a>, <a href="index.html?q=lightweight%20fine%20aggregate">lightweight fine aggregate</a></div><div>Created 2026-07-22 · Updated 2026-08-14T09:07:44Z</div></div>
+<p>Lightweight aggregate is a class of expanded mineral materials, such as clay, shale, slate, or slag, that possesses a lower specific gravity than normal sand and gravel due to its inherent porous structure. These low-density particles are characterized by high water-absorption capacity, allowing them to function as internal reservoirs when pre-saturated prior to mixing with concrete constituents. During cement hydration, the stored moisture is released from within the aggregate particles into the surrounding paste, thereby maintaining internal humidity and supporting continued hydration without altering the external water-to-cement ratio. This internal curing mechanism mitigates self-desiccation and autogenous shrinkage, which reduces cracking while simultaneously enhancing the durability and strength of the hardened concrete. While the inclusion of lightweight aggregate reduces the overall unit weight and elastic modulus of the structural element, it significantly lowers permeability and transport properties to extend service life.</p>
+
+<nav class="page-toc" aria-label="On this page"><p class="page-toc-title">Contents</p><ul><li><a href="#lightweight-aggregate-internal-curing">Lightweight Aggregate Internal Curing</a></li><li><a href="#source-coverage">Source coverage</a></li></ul></nav>
+<details class="sources-toggle"><summary>Sources (11)</summary><div class="sources-body"><a href="#ref-1">Long-Term Plan for Concrete Pavement Research and Technology—The Concrete Pavement Road Map (Second Generation): Volume II, Tracks (FHWA-HRT-11-070) (2012)</a>, <a href="#ref-2">Lifecycle Cost Analysis of Internally Cured Jointed Plain Concrete Pavement (IHRB TR-676) (2017)</a>, <a href="#ref-3">Performance Evaluation of Very Early Strength Latex-Modified Concrete (LMC-VE) Overlay (TR-771) (2024)</a>, <a href="#ref-4">Superabsorbent Polymer in Concrete to Improve Durability (TR-793) (2025)</a>, <a href="#ref-5">Guide Specification for Internally Curing Concrete (TPF-5(286)) (2017)</a>, <a href="#ref-6">Southeast Michigan Local Road Concrete Pavement Durability Study (2006)</a>, <a href="#ref-7">Fiber-Reinforced Concrete for Bridge Decks (TR-767) (2021)</a>, <a href="#ref-8">Impact of Curling and Warping on Concrete Pavement: Phase II (TR-749) (2023)</a>, <a href="#ref-9">Evaluation and Testing of a Lightweight Fine Aggregate Concrete Bridge Deck in Buchanan County, Iowa (2016)</a>, <a href="#ref-10">Impacts of Internally Cured Concrete Paving on Contraction Joint Spacing Phase II (TR-746) (2021)</a>, <a href="#ref-11">Evaluation of the Buchanan County IBRD Bridge on Victor Avenue over Prairie Creek (2017)</a></div></details>
+
+<h2 id="lightweight-aggregate-internal-curing">Lightweight Aggregate Internal Curing</h2>
+<p>Lightweight aggregate consists of porous mineral particles that possess a high water-absorption capacity, allowing them to function as internal reservoirs when pre-saturated. During cement hydration, these aggregates release stored moisture into the surrounding paste, which maintains internal humidity and supports continued hydration without altering the external water-to-cement ratio. This internal curing mechanism mitigates self-desiccation and autogenous shrinkage, thereby reducing cracking and enhancing the long-term durability of the concrete matrix.</p>
+<p><strong>Research problem</strong> — Low water-to-cement ratios in high-performance concrete leave insufficient internal moisture for complete cement hydration, leading to autogenous shrinkage and early-age cracking that compromise structural durability. The effectiveness of lightweight aggregate as an internal curing agent is hindered by the difficulty of controlling its moisture state during batching, where improper saturation can deprive cement paste of necessary water or disrupt mix proportions. Field implementation faces significant logistical challenges in sourcing, transporting, and pre-conditioning lightweight aggregate to ensure consistent internal curing performance without introducing excessive weight or cost burdens. [<sup><a href="#ref-1" aria-label="Reference 1">1</a></sup>] [<sup><a href="#ref-2" aria-label="Reference 2">2</a></sup>] [<sup><a href="#ref-4" aria-label="Reference 4">4</a></sup>] [<sup><a href="#ref-5" aria-label="Reference 5">5</a></sup>] [<sup><a href="#ref-6" aria-label="Reference 6">6</a></sup>] [<sup><a href="#ref-7" aria-label="Reference 7">7</a></sup>] [<sup><a href="#ref-9" aria-label="Reference 9">9</a></sup>] [<sup><a href="#ref-10" aria-label="Reference 10">10</a></sup>] [<sup><a href="#ref-11" aria-label="Reference 11">11</a></sup>]</p>
+<p><strong>State of the art</strong> — The established state-of-the-art for lightweight aggregate internal curing relies on the systematic use of pre-wetted lightweight fine aggregate (LWFA) to replace approximately 20% to 30% of normal-weight fine aggregate, thereby supplying internal water that mitigates autogenous shrinkage and enhances durability in low water-to-cement ratio mixes. Current practice mandates rigorous quality control for LWFA, including compliance with ASTM C1761 specifications and specific pre-saturation protocols such as 48-hour wetting followed by drainage to achieve saturated surface-dry conditions before batching. While LWFA remains the dominant internal-curing agent in U.S. practice due to its regulatory acceptance and proven performance in bridge decks and pavements, emerging research is evaluating superabsorbent polymers (SAPs) as a potentially superior alternative that offers more efficient water release without the handling complexities associated with pre-wetting aggregates. [<sup><a href="#ref-4" aria-label="Reference 4">4</a></sup>] [<sup><a href="#ref-5" aria-label="Reference 5">5</a></sup>] [<sup><a href="#ref-6" aria-label="Reference 6">6</a></sup>] [<sup><a href="#ref-9" aria-label="Reference 9">9</a></sup>] [<sup><a href="#ref-10" aria-label="Reference 10">10</a></sup>]</p>
+<p><strong>Findings from the reports</strong></p>
+<ul>
+<li>Replacing approximately one-fifth of the fine aggregate with lightweight fine aggregate for internal curing lowered the concrete’s unit weight while leaving compressive strength essentially unchanged [<sup><a href="#ref-9" aria-label="Reference 9">9</a></sup>] [<sup><a href="#ref-11" aria-label="Reference 11">11</a></sup>].</li>
+<li>Internal curing with lightweight fine aggregate improved durability by lowering permeability and increasing surface resistivity compared to conventional concrete mixes [<sup><a href="#ref-9" aria-label="Reference 9">9</a></sup>] [<sup><a href="#ref-10" aria-label="Reference 10">10</a></sup>].</li>
+<li>Using dry lightweight aggregate during batching deprived surrounding cement of water, which lowered strength, increased permeability, and interfered with air-entrainment [<sup><a href="#ref-6" aria-label="Reference 6">6</a></sup>].</li>
+<li>Incorporating lightweight fine aggregate extended the hydration process for approximately one month, which yielded higher compressive strengths at later ages and lowered the modulus of elasticity [<sup><a href="#ref-10" aria-label="Reference 10">10</a></sup>].</li>
+<li>Designers reduced pavement slab thickness by approximately one inch while maintaining performance targets, which offset the higher initial material costs of internally cured mixes [<sup><a href="#ref-2" aria-label="Reference 2">2</a></sup>].</li>
+<li>Pavements constructed with internally cured lightweight aggregate showed lower roughness values, less joint faulting, and reduced transverse cracking over a long-term design life [<sup><a href="#ref-2" aria-label="Reference 2">2</a></sup>].</li>
+</ul>
+<p><strong>Novelty &amp; rigor</strong> — The research introduces lightweight fine aggregate as a functional internal-curing reservoir by substituting a calculated portion of conventional sand with pre-saturated particles, thereby supplying hydration water without altering the mix&rsquo;s water-to-cement ratio. This approach is distinct because it relies on a minimal-impact conversion strategy where only the fine aggregate fraction is replaced, while all other mix constituents remain unchanged to preserve standard performance characteristics. Reproducibility of this method requires a rigorous pre-wetting protocol involving extended saturation and controlled drainage periods to ensure the aggregate reaches a stable saturated-surface-dry condition before batching. [<sup><a href="#ref-1" aria-label="Reference 1">1</a></sup>] [<sup><a href="#ref-2" aria-label="Reference 2">2</a></sup>] [<sup><a href="#ref-4" aria-label="Reference 4">4</a></sup>] [<sup><a href="#ref-5" aria-label="Reference 5">5</a></sup>] [<sup><a href="#ref-6" aria-label="Reference 6">6</a></sup>] [<sup><a href="#ref-9" aria-label="Reference 9">9</a></sup>] [<sup><a href="#ref-10" aria-label="Reference 10">10</a></sup>] [<sup><a href="#ref-11" aria-label="Reference 11">11</a></sup>]</p>
+<p><strong>Reported values</strong></p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Value</th>
+<th>Context</th>
+<th>Source</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>initial construction cost increase</td>
+<td>3.2%</td>
+<td>IC pavements in Iowa vs CC pavements with the same thickness</td>
+<td>[<sup><a href="#ref-2" aria-label="Reference 2">2</a></sup>]</td>
+</tr>
+<tr>
+<td>initial construction cost reduction via thickness decrease</td>
+<td>3.1%</td>
+<td>decreasing the thickness of the pavement when utilizing IC concrete</td>
+<td>[<sup><a href="#ref-2" aria-label="Reference 2">2</a></sup>]</td>
+</tr>
+<tr>
+<td>pavement thickness</td>
+<td>8 and 10 in.</td>
+<td>conventionally cured concrete (CC)</td>
+<td>[<sup><a href="#ref-2" aria-label="Reference 2">2</a></sup>]</td>
+</tr>
+<tr>
+<td>thickness reduction</td>
+<td>1 in.</td>
+<td>IC concrete compared to conventionally cured concrete</td>
+<td>[<sup><a href="#ref-2" aria-label="Reference 2">2</a></sup>]</td>
+</tr>
+<tr>
+<td>air content</td>
+<td>4.0%</td>
+<td>slag aggregate core with fair to poor assessment</td>
+<td>[<sup><a href="#ref-6" aria-label="Reference 6">6</a></sup>]</td>
+</tr>
+<tr>
+<td>internal curing dosage</td>
+<td>20%</td>
+<td>IC mixes</td>
+<td>[<sup><a href="#ref-9" aria-label="Reference 9">9</a></sup>]</td>
+</tr>
+<tr>
+<td>LWFA dosage</td>
+<td>20%</td>
+<td>IC mixes</td>
+<td>[<sup><a href="#ref-9" aria-label="Reference 9">9</a></sup>]</td>
+</tr>
+<tr>
+<td>LWFA dosage</td>
+<td>30%</td>
+<td>IC mixes</td>
+<td>[<sup><a href="#ref-9" aria-label="Reference 9">9</a></sup>]</td>
+</tr>
+<tr>
+<td>predicted service life extension</td>
+<td>about 20 years</td>
+<td>IC section compared to control section</td>
+<td>[<sup><a href="#ref-9" aria-label="Reference 9">9</a></sup>]</td>
+</tr>
+<tr>
+<td>service life extension</td>
+<td>20 years</td>
+<td>IC section compared to control section</td>
+<td>[<sup><a href="#ref-9" aria-label="Reference 9">9</a></sup>]</td>
+</tr>
+<tr>
+<td>compressive strength age</td>
+<td>90 days</td>
+<td>both mixture designs with LWFA</td>
+<td>[<sup><a href="#ref-10" aria-label="Reference 10">10</a></sup>]</td>
+</tr>
+<tr>
+<td>initial cost increase</td>
+<td>2.3%</td>
+<td>Washington County</td>
+<td>[<sup><a href="#ref-10" aria-label="Reference 10">10</a></sup>]</td>
+</tr>
+<tr>
+<td>initial cost increase</td>
+<td>3.1%</td>
+<td>Winneshiek County</td>
+<td>[<sup><a href="#ref-10" aria-label="Reference 10">10</a></sup>]</td>
+</tr>
+<tr>
+<td>beam weight reduction</td>
+<td>5%</td>
+<td>beams fabricated with lightweight fine aggregates (LWFAs) compared to conventional concrete</td>
+<td>[<sup><a href="#ref-11" aria-label="Reference 11">11</a></sup>]</td>
+</tr>
+</tbody>
+</table>
+<p>Across the reviewed reports, incorporating lightweight fine aggregate (LWFA) for internal curing consistently enhances concrete durability and performance by sustaining hydration for approximately one month, which yields higher late-age compressive strength, lower modulus of elasticity, and improved surface resistivity compared to conventional mixes. While some studies note that LWFA can slightly reduce unit weight and stiffness without compromising structural integrity or load distribution, others highlight that proper pre-wetting is critical to prevent dry aggregate from absorbing mixing water, which would otherwise lower strength and increase permeability. The internal curing action effectively buffers moisture gradients, thereby reducing autogenous, plastic, and drying shrinkage as well as warping and curling, which allows for thinner slab designs and extends service life despite modest increases in initial material costs. [<sup><a href="#ref-2" aria-label="Reference 2">2</a></sup>] [<sup><a href="#ref-6" aria-label="Reference 6">6</a></sup>] [<sup><a href="#ref-9" aria-label="Reference 9">9</a></sup>] [<sup><a href="#ref-10" aria-label="Reference 10">10</a></sup>]</p>
+<p><strong>Implications</strong> — Designers should specify pre-wetting protocols for lightweight aggregates to ensure they function effectively as internal curing agents, thereby reducing shrinkage and cracking while maintaining structural performance. The adoption of lightweight fine aggregate for internal curing offers significant durability and economic benefits through extended service life and reduced maintenance, despite modest increases in initial material costs. Successful implementation requires rigorous quality control during material sourcing and handling to prevent strength loss from dry aggregate, alongside logistical planning for appropriate lifting equipment due to residual weight constraints. [<sup><a href="#ref-5" aria-label="Reference 5">5</a></sup>] [<sup><a href="#ref-6" aria-label="Reference 6">6</a></sup>] [<sup><a href="#ref-9" aria-label="Reference 9">9</a></sup>] [<sup><a href="#ref-10" aria-label="Reference 10">10</a></sup>] [<sup><a href="#ref-11" aria-label="Reference 11">11</a></sup>]</p>
+<p><strong>Limitations</strong> — The practical benefits of internal curing are limited because the modest weight reduction does not significantly alter mechanical properties or enable lighter handling equipment, while logistical challenges in preconditioning and transporting saturated aggregates add complexity to larger projects. [<sup><a href="#ref-9" aria-label="Reference 9">9</a></sup>] [<sup><a href="#ref-10" aria-label="Reference 10">10</a></sup>] [<sup><a href="#ref-11" aria-label="Reference 11">11</a></sup>]</p>
+<p><small>Evidence: 9 reports (5 primary)</small></p>
+<h2 id="source-coverage">Source coverage</h2>
+<table>
+<thead>
+<tr>
+<th>Source</th>
+<th>Lightweight Aggregate Internal Curing</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>[<sup><a href="#ref-1" aria-label="Reference 1">1</a></sup>]</td>
+<td>✓</td>
+</tr>
+<tr>
+<td>[<sup><a href="#ref-2" aria-label="Reference 2">2</a></sup>]</td>
+<td>✓</td>
+</tr>
+<tr>
+<td>[<sup><a href="#ref-3" aria-label="Reference 3">3</a></sup>]</td>
+<td></td>
+</tr>
+<tr>
+<td>[<sup><a href="#ref-4" aria-label="Reference 4">4</a></sup>]</td>
+<td>✓</td>
+</tr>
+<tr>
+<td>[<sup><a href="#ref-5" aria-label="Reference 5">5</a></sup>]</td>
+<td>✓</td>
+</tr>
+<tr>
+<td>[<sup><a href="#ref-6" aria-label="Reference 6">6</a></sup>]</td>
+<td>✓</td>
+</tr>
+<tr>
+<td>[<sup><a href="#ref-7" aria-label="Reference 7">7</a></sup>]</td>
+<td>✓</td>
+</tr>
+<tr>
+<td>[<sup><a href="#ref-8" aria-label="Reference 8">8</a></sup>]</td>
+<td></td>
+</tr>
+<tr>
+<td>[<sup><a href="#ref-9" aria-label="Reference 9">9</a></sup>]</td>
+<td>✓</td>
+</tr>
+<tr>
+<td>[<sup><a href="#ref-10" aria-label="Reference 10">10</a></sup>]</td>
+<td>✓</td>
+</tr>
+<tr>
+<td>[<sup><a href="#ref-11" aria-label="Reference 11">11</a></sup>]</td>
+<td>✓</td>
+</tr>
+</tbody>
+</table>
+<p><small>⚠ 2 listed sources not cited anywhere on this page: [<sup><a href="#ref-3" aria-label="Reference 3">3</a></sup>], [<sup><a href="#ref-8" aria-label="Reference 8">8</a></sup>]</small></p>
+<section class="references" aria-labelledby="references-heading">
+<h2 id="references-heading">References</h2>
+<ol>
+<li id="ref-1">D. Harrington, R. Rasmussen, D. Merritt, T. Cackler, and P. Taylor, &quot;Long-Term Plan for Concrete Pavement Research and Technology—The Concrete Pavement Road Map (Second Generation): Volume II, Tracks (FHWA-HRT-11-070),&quot; National Center for Concrete Pavement Technology, Iowa State University, Ames, IA, 2012. [Online]. Available: <a href="https://www.fhwa.dot.gov/publications/research/infrastructure/pavements/pccp/11070/11070.pdf" rel="noopener noreferrer" target="_blank">https://www.fhwa.dot.gov/publications/research/infrastructure/pavements/pccp/11070/11070.pdf</a></li><li id="ref-2">P. Vosoughi, S. Tritsch, H. Ceylan, and P. Taylor, &quot;Lifecycle Cost Analysis of Internally Cured Jointed Plain Concrete Pavement,&quot; National Concrete Pavement Technology Center, Ames, IA, Rep. TR-676, 2017. [Online]. Available: <a href="https://publications.iowa.gov/27038/" rel="noopener noreferrer" target="_blank">https://publications.iowa.gov/27038/</a></li><li id="ref-3">K. Wang, B. M. Shankaramurthy, A. Anand, Y. Sargam, K. Freeseman, and B. Phares, &quot;Performance Evaluation of Very Early Strength Latex-Modified Concrete (LMC-VE) Overlay,&quot; Institute for Transportation, Iowa State University, Ames, IA, Rep. TR-771, 2024. [Online]. Available: <a href="https://bec.iastate.edu/wp-content/uploads/2024/10/performance_evaluation_of_LMC-VE_overlay_w_cvr.pdf" rel="noopener noreferrer" target="_blank">https://bec.iastate.edu/wp-content/uploads/2024/10/performance_evaluation_of_LMC-VE_overlay_w_cvr.pdf</a></li><li id="ref-4">B. Zhou, P. Taylor, and K. Wang, &quot;Superabsorbent Polymer in Concrete to Improve Durability,&quot; National Concrete Pavement Technology Center, Iowa State University, Ames, IA, Rep. TR-793, 2025. [Online]. Available: <a href="https://www.intrans.iastate.edu/wp-content/uploads/2025/04/superabsorbent_polymer_in_concrete_w_cvr.pdf" rel="noopener noreferrer" target="_blank">https://www.intrans.iastate.edu/wp-content/uploads/2025/04/superabsorbent_polymer_in_concrete_w_cvr.pdf</a></li><li id="ref-5">W. J. Weiss and L. Montanari, &quot;Guide Specification for Internally Curing Concrete,&quot; National Concrete Pavement Technology Center, Ames, IA, Rep. TPF-5(286), 2017. [Online]. Available: <a href="https://www.intrans.iastate.edu/wp-content/uploads/2018/09/IC_guide_spec_w_cvr.pdf" rel="noopener noreferrer" target="_blank">https://www.intrans.iastate.edu/wp-content/uploads/2018/09/IC_guide_spec_w_cvr.pdf</a></li><li id="ref-6">J. Grove, F. Bektas, and H. Gieselman, &quot;Southeast Michigan Local Road Concrete Pavement Durability Study,&quot; National Concrete Pavement Technology Center, Ames, IA, 2006. [Online]. Available: <a href="https://www.cptechcenter.org/wp-content/uploads/2018/03/mi_pavement_durability.pdf" rel="noopener noreferrer" target="_blank">https://www.cptechcenter.org/wp-content/uploads/2018/03/mi_pavement_durability.pdf</a></li><li id="ref-7">B. Shafei, P. Taylor, B. Phares, and M. Kazemian, &quot;Fiber-Reinforced Concrete for Bridge Decks,&quot; Bridge Engineering Center, Iowa State University, Ames, IA, Rep. TR-767, 2021. [Online]. Available: <a href="https://www.intrans.iastate.edu/wp-content/uploads/2021/12/fiber-reinforced_concrete_in_bridge_decks_w_cvr.pdf" rel="noopener noreferrer" target="_blank">https://www.intrans.iastate.edu/wp-content/uploads/2021/12/fiber-reinforced_concrete_in_bridge_decks_w_cvr.pdf</a></li><li id="ref-8">K. Tian, D. King, B. Yang, S. Kim, A. Alhasan, and H. Ceylan, &quot;Impact of Curling and Warping on Concrete Pavement: Phase II,&quot; Program for Sustainable Pavement Engineering and Research (PROSPER), Iowa State University, Ames, IA, Rep. TR-749, 2023. [Online]. Available: <a href="https://intrans.iastate.edu/app/uploads/2023/06/Impact_of_Curling_and_Warping_Phase_II_w_cvr.pdf" rel="noopener noreferrer" target="_blank">https://intrans.iastate.edu/app/uploads/2023/06/Impact_of_Curling_and_Warping_Phase_II_w_cvr.pdf</a></li><li id="ref-9">P. Taylor, T. Hosteng, X. Wang, and B. Phares, &quot;Evaluation and Testing of a Lightweight Fine Aggregate Concrete Bridge Deck in Buchanan County, Iowa,&quot; National Concrete Pavement Technology Center and Bridge Engineering Center, Ames, IA, Rep. TR-648, 2016. [Online]. Available: <a href="https://www.intrans.iastate.edu/wp-content/uploads/2018/03/Buchanan_LWFA_bridge_deck_w_cvr.pdf" rel="noopener noreferrer" target="_blank">https://www.intrans.iastate.edu/wp-content/uploads/2018/03/Buchanan_LWFA_bridge_deck_w_cvr.pdf</a></li><li id="ref-10">A. Daghighi, P. Taylor, H. Ceylan, and Y. Zhang, &quot;Impacts of Internally Cured Concrete Paving on Contraction Joint Spacing Phase II,&quot; National Concrete Pavement Technology Center, Iowa State University, Ames, IA, Rep. TR-746, 2021. [Online]. Available: <a href="https://www.cptechcenter.org/wp-content/uploads/2021/05/IC_concrete_paving_impacts_phase_II_field_impl_w_cvr.pdf" rel="noopener noreferrer" target="_blank">https://www.cptechcenter.org/wp-content/uploads/2021/05/IC_concrete_paving_impacts_phase_II_field_impl_w_cvr.pdf</a></li><li id="ref-11">B. Phares, T. Hosteng, L. Greimann, and A. Pakhale, &quot;Evaluation of the Buchanan County IBRD Bridge on Victor Avenue over Prairie Creek,&quot; Bridge Engineering Center, Ames, IA, Rep. InTrans Project 12-427, 2017. [Online]. Available: <a href="https://www.intrans.iastate.edu/wp-content/uploads/2018/03/Victor_Ave_over_Prairie_Creek_IBRD_bridge_eval_w_cvr.pdf" rel="noopener noreferrer" target="_blank">https://www.intrans.iastate.edu/wp-content/uploads/2018/03/Victor_Ave_over_Prairie_Creek_IBRD_bridge_eval_w_cvr.pdf</a></li>
+</ol>
+</section></article>
+<div id="uc-banner" role="status" title="This page is still being built and may change."><span aria-hidden="true">🚧</span> Under construction</div>
+</main>
+</div>
+<script>
+(function () {
+  var toggle = document.getElementById('navToggle');
+  var sidebar = document.getElementById('sidebar');
+  var mobile = window.matchMedia('(max-width: 760px)');
+  function setInert() { if (sidebar) { if (mobile.matches && !sidebar.classList.contains('open')) { sidebar.setAttribute('inert', ''); } else { sidebar.removeAttribute('inert'); } } }
+  setInert();
+  if (mobile.addEventListener) mobile.addEventListener('change', setInert);
+  if (toggle && sidebar) {
+    toggle.addEventListener('click', function () {
+      var open = sidebar.classList.toggle('open');
+      toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+      if (open) {
+        sidebar.removeAttribute('inert');
+        var first = sidebar.querySelector('input, a, summary');
+        if (first) first.focus();
+      } else {
+        setInert();
+        toggle.focus();
+      }
+    });
+    sidebar.addEventListener('click', function (e) {
+      if (e.target.closest('a') && mobile.matches) {
+        sidebar.classList.remove('open');
+        toggle.setAttribute('aria-expanded', 'false');
+        setInert();
+      }
+    });
+  }
+  var filter = document.getElementById('filter');
+  var tree = document.getElementById('tree');
+  if (filter && tree) {
+    var snapshot = new Set();
+    tree.querySelectorAll('details').forEach(function (d) { if (d.hasAttribute('open')) snapshot.add(d); });
+    filter.addEventListener('input', function () {
+      var q = filter.value.trim().toLowerCase();
+      var items = tree.querySelectorAll('li');
+      if (!q) {
+        items.forEach(function (li) { li.hidden = false; });
+        tree.querySelectorAll('details').forEach(function (d) { d.open = snapshot.has(d); });
+        return;
+      }
+      items.forEach(function (li) { li.hidden = true; });
+      tree.querySelectorAll('li > a').forEach(function (a) {
+        if (a.textContent.toLowerCase().indexOf(q) === -1) return;
+        var li = a.parentElement;
+        li.hidden = false;
+        var p = li.parentElement;
+        while (p && p !== tree) {
+          if (p.tagName === 'LI') p.hidden = false;
+          if (p.tagName === 'DETAILS') p.open = true;
+          p = p.parentElement;
+        }
+      });
+    });
+  }
+})();
+</script>
+</body>
+</html>

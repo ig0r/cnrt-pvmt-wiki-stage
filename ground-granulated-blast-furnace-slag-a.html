@@ -1,0 +1,508 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ground Granulated Blast-Furnace Slag</title>
+<style>
+:root {
+  --bg: #ffffff;
+  --fg: #1c1c1c;
+  --ink: #1c1c1c;
+  --muted: #5b6472;
+  --sub: #5b6472;
+  --border: #e4e0da;
+  --line: #e4e0da;
+  --chip: #f1ede6;
+  --code: #f4f4f0;
+  --accent: #7a4a63;
+  --link: #2456c7;
+  --sidebar-bg: #23222a;
+  --sidebar-ink: #eae7e2;
+  --sidebar-sub: #9d97a8;
+  --sidebar-line: rgba(255, 255, 255, 0.1);
+  --sidebar-active: #c98fa8;
+  --sidebar-width: 300px;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body { margin: 0; padding: 0; background: var(--bg); color: var(--fg);
+  font: 16px/1.65 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+
+/* a11y: focus-visible (light content + dark sidebar) + skip link (FR-OB-14.1) */
+:focus-visible { outline: 2px solid var(--link); outline-offset: 2px; }
+.sidebar :focus-visible { outline: 2px solid var(--sidebar-active); outline-offset: 2px; }
+.skip-link { position: absolute; left: -9999px; top: 0; background: var(--bg);
+  color: var(--link); padding: .5rem 1rem; border: 1px solid var(--border); z-index: 100; }
+.skip-link:focus { left: 0; }
+
+/* layout shell (adapted from example/00_table_of_contents.html) */
+.shell { display: flex; min-height: 100vh; }
+.sidebar { position: sticky; top: 0; align-self: flex-start; width: var(--sidebar-width);
+  flex: 0 0 var(--sidebar-width); height: 100vh; overflow-y: auto; background: var(--sidebar-bg);
+  color: var(--sidebar-ink); padding: 28px 20px 40px;
+  font-family: "Helvetica Neue", Arial, sans-serif; }
+.sidebar-head { margin-bottom: 18px; padding-bottom: 16px;
+  border-bottom: 1px solid var(--sidebar-line); }
+.brand-kicker { margin: 0 0 6px; letter-spacing: .14em; text-transform: uppercase;
+  font-size: .72rem; color: var(--sidebar-active); font-weight: 700; }
+.brand-title { margin: 0 0 8px; font-size: 1.1rem; line-height: 1.3; font-weight: 700;
+  color: var(--sidebar-ink); }
+.brand-count { margin: 0; font-size: .8rem; color: var(--sidebar-sub); }
+.sidebar-filter { width: 100%; padding: .5rem .7rem; margin: 0 0 16px; font: inherit;
+  font-size: .85rem; color: var(--sidebar-ink); background: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--sidebar-line); border-radius: 6px; }
+.sidebar-filter::placeholder { color: var(--sidebar-sub); }
+.content { flex: 1 1 auto; min-width: 0; padding: 48px 56px 120px; max-width: none; }
+.nav-toggle { display: none; }
+
+/* sidebar hierarchy tree: native <details>, indent capped for 375px (FR-OB-6.4) */
+.tree, .tree ul { list-style: none; margin: 0; padding: 0; }
+.tree li { padding: 1px 0; }
+.tree ul { margin-left: .3rem; padding-left: .6rem; border-left: 1px solid var(--sidebar-line); }
+.tree a { display: inline-block; color: var(--sidebar-sub); text-decoration: none;
+  padding: 3px 6px; border-radius: 5px; overflow-wrap: break-word; word-break: break-word; }
+.tree a:hover { color: var(--sidebar-ink); background: rgba(255, 255, 255, 0.06); }
+.tree a.active { color: var(--sidebar-ink); font-weight: 700;
+  border-left: 3px solid var(--sidebar-active); padding-left: 6px;
+  background: rgba(201, 143, 168, 0.16); }
+.tree details { display: inline; }
+.tree summary { list-style: none; cursor: pointer; color: var(--sidebar-sub);
+  user-select: none; padding: 0 4px; display: inline-block; }
+.tree summary::-webkit-details-marker { display: none; }
+.tree details[open] > summary { color: var(--sidebar-ink); }
+.tree li[hidden] { display: none; }
+
+/* content typography */
+a { color: var(--link); text-decoration: none; }
+a:hover { text-decoration: underline; }
+h1 { font-size: 1.75rem; line-height: 1.25; margin: .1em 0 .4em;
+  border-bottom: 3px solid var(--accent); padding-bottom: .35em; color: var(--ink); }
+h2 { font-size: 1.25rem; color: var(--accent); margin-top: 2rem; padding-bottom: .3rem;
+  border-bottom: 1px solid var(--border); }
+h3 { font-size: 1.05rem; color: var(--sub); }
+p, li { color: var(--ink); }
+blockquote { margin: 1rem 0; padding: .1rem 1rem; border-left: 3px solid var(--border);
+  color: var(--muted); }
+hr { border: none; border-top: 1px solid var(--border); margin: 2rem 0; }
+code { background: var(--code); padding: .1em .35em; border-radius: 4px; font-size: .9em; }
+pre { background: var(--code); padding: .75rem 1rem; border-radius: 6px; overflow-x: auto; }
+pre code { background: none; padding: 0; }
+
+/* tables: override the example no-op with a scrolling block (FR-OB-5.1) */
+table { display: block; overflow-x: auto; border-collapse: collapse; margin: 1rem 0; }
+div.table-scroll { overflow-x: auto; margin: 1rem 0; }
+th, td { border: 1px solid var(--border); padding: .35rem .65rem; text-align: left; }
+th { background: var(--chip); }
+
+/* images capped to the content column (FR-OB-3.4) */
+img { max-width: 100%; height: auto; display: block; margin: 1rem 0;
+  border: 1px solid var(--border); border-radius: 4px; }
+article img { max-width: 100%; height: auto; }
+figure { margin: 1.4em 0; }
+figcaption { font-size: .86rem; color: var(--sub); margin-top: .5em; font-style: italic; }
+
+/* concept-viewer content classes, retuned to the light content palette */
+nav { margin-bottom: 1.5rem; font-size: .9rem; }
+.muted { color: var(--muted); }
+.meta { margin: .25rem 0 1.75rem; padding-bottom: 1.1rem;
+  border-bottom: 1px solid var(--border); font-size: .85rem; color: var(--muted); }
+.meta div { margin-top: .2rem; }
+.tag { display: inline-block; background: var(--chip); border: 1px solid var(--border);
+  border-radius: 999px; padding: 0 .6em; font-size: .74rem; color: var(--muted);
+  margin: 0 .15rem .15rem 0; white-space: nowrap; }
+a.tag:hover { text-decoration: none; color: var(--fg); border-color: var(--muted); }
+.src { font-size: .78em; color: var(--muted); }
+a.src { color: var(--link); }
+.missing { color: var(--muted); border-bottom: 1px dotted var(--muted); cursor: help; }
+.breadcrumb { color: var(--muted); }
+.breadcrumb a { color: var(--link); }
+.breadcrumb .crumb-sep { margin: 0 .35em; color: var(--muted); }
+.breadcrumb .crumb-current { color: var(--fg); }
+.part-of { color: var(--muted); }
+.part-of::before { content: "\2193 "; }
+.subconcepts { font-size: .92rem; color: var(--muted); margin: 0 0 1.6rem; }
+.subconcepts::before { content: "\25b8 "; }
+
+/* citation rules */
+sup a { text-decoration: none; color: var(--link); }
+.references { margin-top: 2.5rem; font-size: .9rem; }
+.references li { margin: .35rem 0; overflow-wrap: anywhere; }
+.references li:target { background: var(--chip); outline: 2px solid var(--accent); }
+.page-toc { border: 1px solid var(--border); border-radius: 6px; padding: .55rem .9rem;
+  margin: 1.25rem 0 1.75rem; background: var(--chip); font-size: .9rem; }
+.page-toc-title { margin: 0 0 .3rem; font-size: .72rem; text-transform: uppercase;
+  letter-spacing: .05em; color: var(--muted); }
+.page-toc ul { margin: 0; padding-left: 1.15rem; }
+.page-toc ul ul { padding-left: 1rem; }
+.page-toc li { margin: .12rem 0; }
+.sources-toggle { margin: .2rem 0; }
+.sources-toggle > summary { cursor: pointer; color: var(--muted); }
+.sources-toggle > summary:hover { color: var(--fg); }
+.sources-body { margin-top: .35rem; }
+.subconcepts-toggle { font-size: .92rem; color: var(--muted); margin: 0 0 1.6rem; }
+.subconcepts-toggle > summary { cursor: pointer; }
+.subconcepts-body { margin-top: .4rem; }
+
+/* responsive: off-canvas sidebar */
+@media (max-width: 900px) {
+  .content { padding: 40px 24px 100px; max-width: 100%; }
+}
+@media (max-width: 760px) {
+  .nav-toggle { display: block; position: fixed; top: 14px; left: 14px; z-index: 40;
+    background: var(--sidebar-bg); color: var(--sidebar-ink); border: none;
+    border-radius: 20px; padding: 10px 16px; font-family: "Helvetica Neue", Arial, sans-serif;
+    font-size: .85rem; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25); }
+  .shell { display: block; }
+  .sidebar { position: fixed; top: 0; left: 0; height: 100vh; z-index: 30;
+    transform: translateX(-100%); transition: transform .2s ease;
+    box-shadow: 4px 0 24px rgba(0, 0, 0, 0.3); }
+  .sidebar.open { transform: translateX(0); }
+  .content { padding: 84px 20px 100px; }
+}
+
+/* print */
+@media print {
+  .sidebar, .nav-toggle { display: none; }
+  .shell { display: block; }
+  .content { padding: 0; max-width: 100%; }
+}
+
+/* reduced motion (FR-OB-14.3) */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  * { transition: none !important; animation: none !important; }
+}
+
+/* FR-MH-5.1: parent_relation typed-edge chip + reading sub-line (md->html reverse builder) */
+.edge { display: inline-block; margin-left: .5em; padding: 0 .55em; border-radius: 999px;
+  border: 1px solid var(--border); background: var(--chip); color: var(--muted);
+  font-size: .72rem; white-space: nowrap; vertical-align: baseline; }
+.edge-taxonomic { border-color: #6b7fd7; color: #4a5fc0; }
+.edge-evaluative { border-color: #d78f6b; color: #b5673f; }
+.edge-attributive { border-color: #6bb2d7; color: #3f86b5; }
+.edge-compositional { border-color: #7ac07a; color: #4a9a4a; }
+.edge-causal { border-color: #c07a9a; color: #a04a72; }
+.edge-reading { font-size: .8rem; color: var(--muted); font-style: italic; margin-top: .15rem; }
+
+/* FR-MH-17: per-page under-construction badge (md->html reverse builder) */
+#uc-banner{position:fixed;top:14px;right:14px;z-index:100000;display:inline-flex;align-items:center;
+  gap:.45em;padding:.5em .9em;background:#ffcf33;color:#1a1a1a;border:2px solid #1a1a1a;border-radius:10px;
+  font:700 .82rem/1 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;letter-spacing:.03em;
+  text-transform:uppercase;box-shadow:0 3px 12px rgba(0,0,0,.28);pointer-events:none;user-select:none}
+@media (prefers-reduced-motion:no-preference){#uc-banner{animation:uc-bob 1.8s ease-in-out infinite}
+  @keyframes uc-bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-2px)}}}
+@media (max-width:760px){#uc-banner{top:10px;right:10px;font-size:.72rem;padding:.4em .7em}}
+</style>
+</head>
+<body>
+<!-- Generated by output-builder 1.0 from corpus: /Users/igor/dev/llm/ak-llm-wiki/llm-wiki-tools/hierarchy_v2/15-concept-reviewer-pages -->
+<a class="skip-link" href="#content">Skip to content</a>
+<button id="navToggle" class="nav-toggle" aria-label="Toggle navigation" aria-controls="sidebar" aria-expanded="false">&#9776; Concepts</button>
+<div class="shell">
+<nav class="sidebar" id="sidebar" aria-label="Concept hierarchy">
+<div class="sidebar-head">
+<p class="brand-kicker">Wiki</p>
+<p class="brand-title">Concepts</p>
+<p class="brand-count">10 concepts</p>
+</div>
+<input id="filter" class="sidebar-filter" type="search" aria-label="Filter concepts by title, tag, or alias" placeholder="Filter concepts…">
+<ul class="tree" id="tree"></ul>
+</nav>
+<main class="content" id="content" tabindex="-1">
+<nav aria-label="Breadcrumb"><a href="index.html">&larr; All concepts</a></nav>
+<article><h1>Ground Granulated Blast-Furnace Slag</h1>
+<div class="meta"><div><a class="tag" href="index.html?q=concrete">concrete</a><a class="tag" href="index.html?q=ggbfs">ggbfs</a><a class="tag" href="index.html?q=materials">materials</a><a class="tag" href="index.html?q=scm">scm</a><a class="tag" href="index.html?q=slag">slag</a></div><div>Also known as: <a href="index.html?q=GGBFS">GGBFS</a>, <a href="index.html?q=blast-furnace%20slag">blast-furnace slag</a>, <a href="index.html?q=slag">slag</a>, <a href="index.html?q=slag%20cement">slag cement</a></div><div>Created 2026-05-20 · Updated 2026-08-14T14:15:39Z</div></div>
+<p>Ground granulated blast-furnace slag is a finely ground, largely amorphous by-product of iron production obtained by rapidly quenching molten slag to vitrify it into a glassy powder. It functions as a supplementary cementitious material that exhibits latent hydraulic and pozzolanic properties, meaning it reacts slowly with water on its own but accelerates significantly in the presence of alkaline activators such as Portland cement. When blended with ordinary Portland cement, the slag reacts with calcium hydroxide to form additional calcium-silicate-hydrate gel, which contributes to later-age strength development and reduces the overall heat of hydration. This secondary reaction mechanism enhances long-term durability by lowering concrete permeability and improving resistance to chemical attacks such as sulfate attack and alkali-silica reaction.</p>
+
+<nav class="page-toc" aria-label="On this page"><p class="page-toc-title">Contents</p><ul><li><a href="#ggbfs-properties-and-performance">GGBFS Properties And Performance</a></li><li><a href="#source-coverage">Source coverage</a></li></ul></nav>
+<details class="sources-toggle"><summary>Sources (21)</summary><div class="sources-body"><a href="#ref-1">Development of Performance Properties of Ternary Mixes: Scoping Study (Phase 1) (2004)</a>, <a href="#ref-2">Development of Performance Properties of Ternary Mixtures: Field Demonstrations and Project Summary (2012)</a>, <a href="#ref-3">Materials and Mix Optimization Procedures for PCC Pavements (TR-484, Proj. 3) (2006)</a>, <a href="#ref-4">Evaluating Properties of Blended Cements for Concrete Pavements (2003)</a>, <a href="#ref-5">Developing a Simple and Rapid Test for Monitoring the Heat Evolution of Concrete Mixtures (Phase 3) (2006)</a>, <a href="#ref-6">Southeast Michigan Local Road Concrete Pavement Durability Study (2006)</a>, <a href="#ref-7">Development of Performance Properties of Ternary Mixes, Phase 1 (2007)</a>, <a href="#ref-8">Material and Construction Optimization for Prevention of Premature Pavement Distress in PCC Pavements (2008)</a>, <a href="#ref-9">Crack Development in Ternary Mix Concrete Utilizing Various Saw Depths (TR-587) (2009)</a>, <a href="#ref-10">Impact of Curling and Warping on Concrete Pavement (Phase I, TR-668) (2016)</a>, <a href="#ref-11">Deicer Scaling Resistance ... Containing Slag Cement, Phase 1: Site Selection and Analysis of Field Cores (2008)</a>, <a href="#ref-12">Deicer Scaling Resistance of Concrete Mixtures Containing Slag Cement, Phase 3 (2014)</a>, <a href="#ref-13">Deicer Scaling Resistance of Concrete Mixtures Containing Slag Cement, Phase 2 (2012)</a>, <a href="#ref-14">Development of Performance Properties of Ternary Mixtures: Laboratory Study on Concrete (2011)</a>, <a href="#ref-15">Long-Term Plan for Concrete Pavement Research and Technology—The Concrete Pavement Road Map (Second Generation): Volume II, Tracks (FHWA-HRT-11-070) (2012)</a>, <a href="#ref-16">Self-Consolidating Concrete—Applications for Slip-Form Paving: Phase II (2011)</a>, <a href="#ref-17">An Integrated Study of Pervious Concrete Mixture Design for Wearing Course Applications (2011)</a>, <a href="#ref-18">Optimizing Cementitious Content in Concrete Mixtures for Required Performance (2012)</a>, <a href="#ref-19">Concrete Pavement MDA: Application of a Portable X-Ray Fluorescence Technique to Assess Concrete Mix Proportions (2012)</a>, <a href="#ref-20">Concrete Pavement MDA: Comparison of Setting Time Measured Using Ultrasonic Wave Propagation With Saw-Cutting Times on Pavements in Iowa (2014)</a>, <a href="#ref-21">Evaluation and Testing of a Lightweight Fine Aggregate Concrete Bridge Deck in Buchanan County, Iowa (2016)</a></div></details>
+
+<h2 id="ggbfs-properties-and-performance">GGBFS Properties And Performance</h2>
+<p>Ground granulated blast-furnace slag is a glassy, amorphous by-product of iron production that acts as a latent hydraulic supplementary cementitious material [<sup><a href="#ref-4" aria-label="Reference 4">4</a></sup>] [<sup><a href="#ref-5" aria-label="Reference 5">5</a></sup>] [<sup><a href="#ref-6" aria-label="Reference 6">6</a></sup>] [<sup><a href="#ref-7" aria-label="Reference 7">7</a></sup>] [<sup><a href="#ref-8" aria-label="Reference 8">8</a></sup>] [<sup><a href="#ref-14" aria-label="Reference 14">14</a></sup>] [<sup><a href="#ref-16" aria-label="Reference 16">16</a></sup>]. Its reactivity is governed by its chemical composition and fineness, allowing it to participate in hydration reactions that form additional calcium-silicate-hydrate gel when activated by the alkaline environment of Portland cement [<sup><a href="#ref-4" aria-label="Reference 4">4</a></sup>] [<sup><a href="#ref-5" aria-label="Reference 5">5</a></sup>] [<sup><a href="#ref-6" aria-label="Reference 6">6</a></sup>] [<sup><a href="#ref-7" aria-label="Reference 7">7</a></sup>] [<sup><a href="#ref-14" aria-label="Reference 14">14</a></sup>]. This pozzolanic activity typically results in slower early-age strength development but enhances long-term mechanical properties and durability by reducing permeability and mitigating chemical attacks [<sup><a href="#ref-6" aria-label="Reference 6">6</a></sup>] [<sup><a href="#ref-8" aria-label="Reference 8">8</a></sup>] [<sup><a href="#ref-11" aria-label="Reference 11">11</a></sup>] [<sup><a href="#ref-13" aria-label="Reference 13">13</a></sup>] [<sup><a href="#ref-14" aria-label="Reference 14">14</a></sup>].</p>
+<p><strong>Research problem</strong> — The inherent compositional variability of GGBFS, stemming from its by-product nature, makes it difficult to predict mix performance and maintain consistency with uniformity requirements. Incorporating GGBFS introduces constructability challenges such as rapid slump loss, unstable air content, and unpredictable setting times that disrupt construction schedules. Standard testing methods for de-icer scaling yield overly pessimistic results for high-slag mixes, potentially restricting the use of a material that offers long-term sustainability benefits. The use of GGBFS as coarse aggregate creates issues with high absorptivity and sulfur release, leading to excessive shrinkage cracking and reduced durability. [<sup><a href="#ref-1" aria-label="Reference 1">1</a></sup>] [<sup><a href="#ref-2" aria-label="Reference 2">2</a></sup>] [<sup><a href="#ref-3" aria-label="Reference 3">3</a></sup>] [<sup><a href="#ref-6" aria-label="Reference 6">6</a></sup>] [<sup><a href="#ref-7" aria-label="Reference 7">7</a></sup>] [<sup><a href="#ref-8" aria-label="Reference 8">8</a></sup>] [<sup><a href="#ref-11" aria-label="Reference 11">11</a></sup>] [<sup><a href="#ref-12" aria-label="Reference 12">12</a></sup>] [<sup><a href="#ref-13" aria-label="Reference 13">13</a></sup>] [<sup><a href="#ref-15" aria-label="Reference 15">15</a></sup>]</p>
+<p><strong>State of the art</strong> — GGBFS is a mature, widely adopted supplementary cementitious material typically replacing 20% to 35% of Portland cement in binary or ternary blends to enhance long-term durability and reduce permeability. Performance is governed by chemistry and fineness, with ASTM C989 Grades 100 and 120 providing standardized benchmarks for quality control based on mortar-cube strength. Modern practice employs maturity-based methods and predictive tools like HIPERPAV to manage slower early-age strength development and thermal effects, while ongoing research refines ternary blend optimization for superior durability. [<sup><a href="#ref-1" aria-label="Reference 1">1</a></sup>] [<sup><a href="#ref-2" aria-label="Reference 2">2</a></sup>] [<sup><a href="#ref-3" aria-label="Reference 3">3</a></sup>] [<sup><a href="#ref-4" aria-label="Reference 4">4</a></sup>] [<sup><a href="#ref-5" aria-label="Reference 5">5</a></sup>] [<sup><a href="#ref-6" aria-label="Reference 6">6</a></sup>] [<sup><a href="#ref-7" aria-label="Reference 7">7</a></sup>] [<sup><a href="#ref-8" aria-label="Reference 8">8</a></sup>] [<sup><a href="#ref-9" aria-label="Reference 9">9</a></sup>] [<sup><a href="#ref-10" aria-label="Reference 10">10</a></sup>] [<sup><a href="#ref-11" aria-label="Reference 11">11</a></sup>] [<sup><a href="#ref-12" aria-label="Reference 12">12</a></sup>] [<sup><a href="#ref-13" aria-label="Reference 13">13</a></sup>] [<sup><a href="#ref-14" aria-label="Reference 14">14</a></sup>] [<sup><a href="#ref-16" aria-label="Reference 16">16</a></sup>] [<sup><a href="#ref-18" aria-label="Reference 18">18</a></sup>]</p>
+<p><strong>Findings from the reports</strong></p>
+<ul>
+<li>Construction variables such as water-to-cement ratio and curing practices dominate deicer-scaling performance, with slag content showing only a weak link to scaling resistance [<sup><a href="#ref-11" aria-label="Reference 11">11</a></sup>] [<sup><a href="#ref-12" aria-label="Reference 12">12</a></sup>] [<sup><a href="#ref-13" aria-label="Reference 13">13</a></sup>].</li>
+<li>GGBFS lowers the peak heat of hydration and reduces the maximum temperature of concrete, thereby decreasing the risk of thermal cracking compared to ordinary Portland cement [<sup><a href="#ref-4" aria-label="Reference 4">4</a></sup>] [<sup><a href="#ref-5" aria-label="Reference 5">5</a></sup>].</li>
+<li>The influence of GGBFS on setting time is not uniform and depends on the slag source; some slags do not delay set time or even reduce extended set times caused by fly ash, while others lengthen both initial and final set times [<sup><a href="#ref-4" aria-label="Reference 4">4</a></sup>] [<sup><a href="#ref-5" aria-label="Reference 5">5</a></sup>].</li>
+<li>Finer GGBFS grades exhibit higher reactivity, generating a larger heat of hydration and producing higher early-age strength development than coarser grades [<sup><a href="#ref-7" aria-label="Reference 7">7</a></sup>] [<sup><a href="#ref-14" aria-label="Reference 14">14</a></sup>].</li>
+<li>GGBFS is highly effective for mitigating alkali-silica reaction, producing very low expansion values that remain well below standard limits in most ternary blends [<sup><a href="#ref-7" aria-label="Reference 7">7</a></sup>] [<sup><a href="#ref-14" aria-label="Reference 14">14</a></sup>].</li>
+<li>GGBFS markedly improves concrete durability by lowering rapid chloride permeability and reducing chloride ion flow compared to plain cement mixes [<sup><a href="#ref-13" aria-label="Reference 13">13</a></sup>] [<sup><a href="#ref-18" aria-label="Reference 18">18</a></sup>].</li>
+<li>Using GGBFS as a coarse aggregate can create durability risks if not properly handled, as high absorption may deprive cement of water and contribute sulfur that promotes ettringite formation [<sup><a href="#ref-6" aria-label="Reference 6">6</a></sup>] [<sup><a href="#ref-8" aria-label="Reference 8">8</a></sup>].</li>
+</ul>
+<p><strong>Novelty &amp; rigor</strong> — The research introduces a systematic experimental-analytical framework that measures kinetic parameters, such as datum temperature and activation energy, for slag-rich blends rather than relying on generic assumptions. This approach uniquely integrates measured thermal properties into maturity models to predict early-age stress development and cracking risk across varying seasonal conditions. The methodology is further distinguished by its comprehensive evaluation of slag within extensive ternary blend matrices, utilizing statistical regression to isolate the specific effects of slag fineness on heat evolution and durability metrics. [<sup><a href="#ref-1" aria-label="Reference 1">1</a></sup>] [<sup><a href="#ref-2" aria-label="Reference 2">2</a></sup>] [<sup><a href="#ref-3" aria-label="Reference 3">3</a></sup>] [<sup><a href="#ref-4" aria-label="Reference 4">4</a></sup>] [<sup><a href="#ref-5" aria-label="Reference 5">5</a></sup>] [<sup><a href="#ref-6" aria-label="Reference 6">6</a></sup>] [<sup><a href="#ref-7" aria-label="Reference 7">7</a></sup>] [<sup><a href="#ref-8" aria-label="Reference 8">8</a></sup>] [<sup><a href="#ref-10" aria-label="Reference 10">10</a></sup>] [<sup><a href="#ref-11" aria-label="Reference 11">11</a></sup>] [<sup><a href="#ref-12" aria-label="Reference 12">12</a></sup>] [<sup><a href="#ref-13" aria-label="Reference 13">13</a></sup>] [<sup><a href="#ref-14" aria-label="Reference 14">14</a></sup>] [<sup><a href="#ref-16" aria-label="Reference 16">16</a></sup>] [<sup><a href="#ref-17" aria-label="Reference 17">17</a></sup>] [<sup><a href="#ref-18" aria-label="Reference 18">18</a></sup>] [<sup><a href="#ref-19" aria-label="Reference 19">19</a></sup>] [<sup><a href="#ref-21" aria-label="Reference 21">21</a></sup>]</p>
+<p><strong>Reported values</strong></p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Value</th>
+<th>Context</th>
+<th>Source</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>compressive strength comparison time</td>
+<td>28 days</td>
+<td>ternary mixtures vs pure portland cement control</td>
+<td>[<sup><a href="#ref-2" aria-label="Reference 2">2</a></sup>]</td>
+</tr>
+<tr>
+<td>entrained air volume</td>
+<td>4 percent</td>
+<td>mixtures with sufficient freeze-thaw durability</td>
+<td>[<sup><a href="#ref-2" aria-label="Reference 2">2</a></sup>]</td>
+</tr>
+<tr>
+<td>fly ash content</td>
+<td>15%</td>
+<td>ternary cement mix with Lafarge slag-blended cement</td>
+<td>[<sup><a href="#ref-4" aria-label="Reference 4">4</a></sup>]</td>
+</tr>
+<tr>
+<td>slag content</td>
+<td>20%</td>
+<td>Lafarge slag-blended cement used with 15% fly ash</td>
+<td>[<sup><a href="#ref-4" aria-label="Reference 4">4</a></sup>]</td>
+</tr>
+<tr>
+<td>slag replacement range</td>
+<td>20%-35%</td>
+<td>concrete made with 15% fly ash under typical seasonal conditions</td>
+<td>[<sup><a href="#ref-4" aria-label="Reference 4">4</a></sup>]</td>
+</tr>
+<tr>
+<td>slag content</td>
+<td>10%</td>
+<td>addition of slag</td>
+<td>[<sup><a href="#ref-5" aria-label="Reference 5">5</a></sup>]</td>
+</tr>
+<tr>
+<td>time to joint cracking</td>
+<td>25 days</td>
+<td>all 30 joints after paving</td>
+<td>[<sup><a href="#ref-9" aria-label="Reference 9">9</a></sup>]</td>
+</tr>
+<tr>
+<td>diagonal relative deflection</td>
+<td>+0. 04 to +15.5 mils</td>
+<td>Site 6 at STA113 of US 30 in Tama County</td>
+<td>[<sup><a href="#ref-10" aria-label="Reference 10">10</a></sup>]</td>
+</tr>
+<tr>
+<td>longitudinal relative deflection</td>
+<td>-13.8 to -5.9 mils</td>
+<td>Site 6 at STA113 of US 30 in Tama County</td>
+<td>[<sup><a href="#ref-10" aria-label="Reference 10">10</a></sup>]</td>
+</tr>
+<tr>
+<td>transverse relative deflection</td>
+<td>+11.6 to +22.7 mils</td>
+<td>Site 6 at STA113 of US 30 in Tama County</td>
+<td>[<sup><a href="#ref-10" aria-label="Reference 10">10</a></sup>]</td>
+</tr>
+<tr>
+<td>scaling mass loss</td>
+<td>1.5 lbs/yd2</td>
+<td>Ontario Provincial Standard OPSS LS-412 allowable limit after 50 cycles</td>
+<td>[<sup><a href="#ref-11" aria-label="Reference 11">11</a></sup>]</td>
+</tr>
+<tr>
+<td>scaling mass loss</td>
+<td>less than about 0.7 lb/yd2</td>
+<td>specimens with good visual ratings (e.g., 0 or 1)</td>
+<td>[<sup><a href="#ref-11" aria-label="Reference 11">11</a></sup>]</td>
+</tr>
+<tr>
+<td>slag dosage</td>
+<td>50%</td>
+<td>total cementitious material in the mixture</td>
+<td>[<sup><a href="#ref-12" aria-label="Reference 12">12</a></sup>]</td>
+</tr>
+<tr>
+<td>binder content</td>
+<td>500 pcy</td>
+<td>PC and C Ash mixtures</td>
+<td>[<sup><a href="#ref-18" aria-label="Reference 18">18</a></sup>]</td>
+</tr>
+<tr>
+<td>binder content</td>
+<td>600 pcy</td>
+<td>Slag and F Ash mixtures</td>
+<td>[<sup><a href="#ref-18" aria-label="Reference 18">18</a></sup>]</td>
+</tr>
+</tbody>
+</table>
+<p><small>2 more distinct values omitted here; the full span-verified set is in the quantities sidecar.</small></p>
+<p>Across the reviewed reports, GGBFS consistently enhances long-term durability by significantly reducing chloride permeability and mitigating alkali-silica reaction expansion, although its impact on deicer scaling is variable and often secondary to construction quality. While GGBFS generally maintains or improves compressive strength at later ages, it introduces complexity in fresh-state properties by typically increasing water demand and altering setting times depending on the specific slag grade and blend composition. The thermal behavior of GGBFS is highly sensitive to fineness and curing temperature, with finer grades generating higher heat evolution that can accelerate early strength gain but also influence shrinkage and cracking potential. [<sup><a href="#ref-4" aria-label="Reference 4">4</a></sup>] [<sup><a href="#ref-5" aria-label="Reference 5">5</a></sup>] [<sup><a href="#ref-7" aria-label="Reference 7">7</a></sup>] [<sup><a href="#ref-11" aria-label="Reference 11">11</a></sup>] [<sup><a href="#ref-13" aria-label="Reference 13">13</a></sup>] [<sup><a href="#ref-14" aria-label="Reference 14">14</a></sup>]</p>
+<p><strong>Implications</strong> — Designers must calibrate mix proportions and construction schedules to the specific GGBFS source, as variations in fineness and chemical composition significantly alter water demand, setting time, and early-age strength development. Specifications should permit higher slag replacement levels to leverage durability benefits, provided that strict controls on water-cement ratio, air entrainment quality, and curing temperature are enforced to mitigate thermal cracking and scaling risks. Practitioners should prioritize GGBFS in ternary blends to effectively suppress alkali-silica reaction and reduce the carbon footprint, while managing increased paste viscosity through appropriate admixture selection. [<sup><a href="#ref-4" aria-label="Reference 4">4</a></sup>] [<sup><a href="#ref-7" aria-label="Reference 7">7</a></sup>] [<sup><a href="#ref-8" aria-label="Reference 8">8</a></sup>] [<sup><a href="#ref-13" aria-label="Reference 13">13</a></sup>] [<sup><a href="#ref-14" aria-label="Reference 14">14</a></sup>] [<sup><a href="#ref-16" aria-label="Reference 16">16</a></sup>]</p>
+<p><strong>Limitations</strong> — The conclusions are restricted to specific supplier sources, blending methods, and laboratory conditions, limiting generalizability to other slag grades or field environments. Predictive models for strength and performance are unreliable when extrapolated beyond the limited experimental ranges of replacement levels and material fineness examined in the studies. Standard laboratory scaling tests may be overly aggressive compared to field conditions, creating uncertainty about the actual durability benefits of slag against deicing salts. [<sup><a href="#ref-3" aria-label="Reference 3">3</a></sup>] [<sup><a href="#ref-4" aria-label="Reference 4">4</a></sup>] [<sup><a href="#ref-7" aria-label="Reference 7">7</a></sup>] [<sup><a href="#ref-12" aria-label="Reference 12">12</a></sup>] [<sup><a href="#ref-13" aria-label="Reference 13">13</a></sup>]</p>
+<p><small>Evidence: 20 reports (13 primary)</small></p>
+<h2 id="source-coverage">Source coverage</h2>
+<table>
+<thead>
+<tr>
+<th>Source</th>
+<th>GGBFS Properties And Performance</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>[<sup><a href="#ref-1" aria-label="Reference 1">1</a></sup>]</td>
+<td>✓</td>
+</tr>
+<tr>
+<td>[<sup><a href="#ref-2" aria-label="Reference 2">2</a></sup>]</td>
+<td>✓</td>
+</tr>
+<tr>
+<td>[<sup><a href="#ref-3" aria-label="Reference 3">3</a></sup>]</td>
+<td>✓</td>
+</tr>
+<tr>
+<td>[<sup><a href="#ref-4" aria-label="Reference 4">4</a></sup>]</td>
+<td>✓</td>
+</tr>
+<tr>
+<td>[<sup><a href="#ref-5" aria-label="Reference 5">5</a></sup>]</td>
+<td>✓</td>
+</tr>
+<tr>
+<td>[<sup><a href="#ref-6" aria-label="Reference 6">6</a></sup>]</td>
+<td>✓</td>
+</tr>
+<tr>
+<td>[<sup><a href="#ref-7" aria-label="Reference 7">7</a></sup>]</td>
+<td>✓</td>
+</tr>
+<tr>
+<td>[<sup><a href="#ref-8" aria-label="Reference 8">8</a></sup>]</td>
+<td>✓</td>
+</tr>
+<tr>
+<td>[<sup><a href="#ref-9" aria-label="Reference 9">9</a></sup>]</td>
+<td>✓</td>
+</tr>
+<tr>
+<td>[<sup><a href="#ref-10" aria-label="Reference 10">10</a></sup>]</td>
+<td>✓</td>
+</tr>
+<tr>
+<td>[<sup><a href="#ref-11" aria-label="Reference 11">11</a></sup>]</td>
+<td>✓</td>
+</tr>
+<tr>
+<td>[<sup><a href="#ref-12" aria-label="Reference 12">12</a></sup>]</td>
+<td>✓</td>
+</tr>
+<tr>
+<td>[<sup><a href="#ref-13" aria-label="Reference 13">13</a></sup>]</td>
+<td>✓</td>
+</tr>
+<tr>
+<td>[<sup><a href="#ref-14" aria-label="Reference 14">14</a></sup>]</td>
+<td>✓</td>
+</tr>
+<tr>
+<td>[<sup><a href="#ref-15" aria-label="Reference 15">15</a></sup>]</td>
+<td>✓</td>
+</tr>
+<tr>
+<td>[<sup><a href="#ref-16" aria-label="Reference 16">16</a></sup>]</td>
+<td>✓</td>
+</tr>
+<tr>
+<td>[<sup><a href="#ref-17" aria-label="Reference 17">17</a></sup>]</td>
+<td>✓</td>
+</tr>
+<tr>
+<td>[<sup><a href="#ref-18" aria-label="Reference 18">18</a></sup>]</td>
+<td>✓</td>
+</tr>
+<tr>
+<td>[<sup><a href="#ref-19" aria-label="Reference 19">19</a></sup>]</td>
+<td>✓</td>
+</tr>
+<tr>
+<td>[<sup><a href="#ref-20" aria-label="Reference 20">20</a></sup>]</td>
+<td></td>
+</tr>
+<tr>
+<td>[<sup><a href="#ref-21" aria-label="Reference 21">21</a></sup>]</td>
+<td>✓</td>
+</tr>
+</tbody>
+</table>
+<p><small>⚠ 1 listed source not cited anywhere on this page: [<sup><a href="#ref-20" aria-label="Reference 20">20</a></sup>]</small></p>
+<section class="references" aria-labelledby="references-heading">
+<h2 id="references-heading">References</h2>
+<ol>
+<li id="ref-1">S. Schlorholtz, &quot;Development of Performance Properties of Ternary Mixes: Scoping Study (Phase 1),&quot; Center for Portland Cement Concrete Pavement Technology, Iowa State University, Ames, IA, Rep. DTFH61-01-X-00042 (Project 13), 2004. [Online]. Available: <a href="https://www.cptechcenter.org/wp-content/uploads/2018/03/ternary_mixes.pdf" rel="noopener noreferrer" target="_blank">https://www.cptechcenter.org/wp-content/uploads/2018/03/ternary_mixes.pdf</a></li><li id="ref-2">P. Taylor, P. Tikalsky, K. Wang, G. Fick, and X. Wang, &quot;Development of Performance Properties of Ternary Mixtures: Field Demonstrations and Project Summary,&quot; National Concrete Pavement Technology Center, Ames, IA, Rep. TPF-5(117), 2012. [Online]. Available: <a href="https://www.intrans.iastate.edu/wp-content/uploads/2018/03/ternary_final_w_cvr.pdf" rel="noopener noreferrer" target="_blank">https://www.intrans.iastate.edu/wp-content/uploads/2018/03/ternary_final_w_cvr.pdf</a></li><li id="ref-3">S. Schlorholtz, K. Wang, J. Hu, and S. Zhang, &quot;Materials and Mix Optimization Procedures for PCC Pavements,&quot; CTRE, Iowa State University, Ames, IA, Rep. TR-484, 2006. [Online]. Available: <a href="https://www.intrans.iastate.edu/wp-content/uploads/2018/03/mco-final.pdf" rel="noopener noreferrer" target="_blank">https://www.intrans.iastate.edu/wp-content/uploads/2018/03/mco-final.pdf</a></li><li id="ref-4">K. Wang and Z. Ge, &quot;Evaluating Properties of Blended Cements for Concrete Pavements,&quot; Department of Civil, Construction and Environmental Engineering, Iowa State University, Ames, IA, 2003. [Online]. Available: <a href="https://www.intrans.iastate.edu/wp-content/uploads/2018/03/blended_cements-1.pdf" rel="noopener noreferrer" target="_blank">https://www.intrans.iastate.edu/wp-content/uploads/2018/03/blended_cements-1.pdf</a></li><li id="ref-5">K. Wang, Z. Ge, J. Grove, J. M. Ruiz, and R. Rasmussen, &quot;Developing a Simple and Rapid Test for Monitoring the Heat Evolution of Concrete Mixtures (Phase 3),&quot; CTRE, Iowa State University, Ames, IA, Rep. FHWA Project 17 (Phase I), 2006. [Online]. Available: <a href="https://www.intrans.iastate.edu/wp-content/uploads/2018/03/CalorimeterReportPhaseIII.pdf" rel="noopener noreferrer" target="_blank">https://www.intrans.iastate.edu/wp-content/uploads/2018/03/CalorimeterReportPhaseIII.pdf</a></li><li id="ref-6">J. Grove, F. Bektas, and H. Gieselman, &quot;Southeast Michigan Local Road Concrete Pavement Durability Study,&quot; National Concrete Pavement Technology Center, Ames, IA, 2006. [Online]. Available: <a href="https://www.cptechcenter.org/wp-content/uploads/2018/03/mi_pavement_durability.pdf" rel="noopener noreferrer" target="_blank">https://www.cptechcenter.org/wp-content/uploads/2018/03/mi_pavement_durability.pdf</a></li><li id="ref-7">P. Tikalsky, V. Schaefer, K. Wang, B. Scheetz, T. Rupnow, A. St. Clair, M. Siddiqi, and S. Marquez, &quot;Development of Performance Properties of Ternary Mixes, Phase 1,&quot; Center for Transportation Research and Education, Ames, IA, Rep. TPF-5(117), 2007. [Online]. Available: <a href="https://www.intrans.iastate.edu/research/completed/development-of-performance-properties-of-ternary-mixes-phase-1/" rel="noopener noreferrer" target="_blank">https://www.intrans.iastate.edu/research/completed/development-of-performance-properties-of-ternary-mixes-phase-1/</a></li><li id="ref-8">J. Grove, G. Fick, T. Rupnow, and F. Bektas, &quot;Material and Construction Optimization for Prevention of Premature Pavement Distress in PCC Pavements,&quot; National Concrete Pavement Technology Center, Ames, IA, Rep. TPF-5(066), 2008. [Online]. Available: <a href="https://www.intrans.iastate.edu/wp-content/uploads/2018/03/mco-final.pdf" rel="noopener noreferrer" target="_blank">https://www.intrans.iastate.edu/wp-content/uploads/2018/03/mco-final.pdf</a></li><li id="ref-9">K. Wang, J. Hu, F. Bektas, P. Taylor, and H. Ceylan, &quot;Crack Development in Ternary Mix Concrete Utilizing Various Saw Depths,&quot; National Concrete Pavement Technology Center, Ames, IA, Rep. TR-587, 2009. [Online]. Available: <a href="https://publications.iowa.gov/19999/1/IADOT_tr_587_Crack_Development_Ternary_Mix_Concrete_Saw_Depths_February_2009.pdf" rel="noopener noreferrer" target="_blank">https://publications.iowa.gov/19999/1/IADOT_tr_587_Crack_Development_Ternary_Mix_Concrete_Saw_Depths_February_2009.pdf</a></li><li id="ref-10">H. Ceylan, S. Yang, K. Gopalakrishnan, S. Kim, P. Taylor, and A. Alhasan, &quot;Impact of Curling and Warping on Concrete Pavement,&quot; Institute for Transportation, Ames, IA, Rep. TR-668, 2016. [Online]. Available: <a href="https://www.intrans.iastate.edu/wp-content/uploads/2018/03/curling_and_warping_impact_on_concrete_pvmt_w_cvr.pdf" rel="noopener noreferrer" target="_blank">https://www.intrans.iastate.edu/wp-content/uploads/2018/03/curling_and_warping_impact_on_concrete_pvmt_w_cvr.pdf</a></li><li id="ref-11">S. Schlorholtz and R. D. Hooton, &quot;Deicer Scaling Resistance ... Containing Slag Cement, Phase 1: Site Selection and Analysis of Field Cores,&quot; National Concrete Pavement Technology Center, Ames, IA, Rep. TPF-5(100), 2008. [Online]. Available: <a href="https://www.cptechcenter.org/wp-content/uploads/2018/03/schlorholtz_deicing_phase1.pdf" rel="noopener noreferrer" target="_blank">https://www.cptechcenter.org/wp-content/uploads/2018/03/schlorholtz_deicing_phase1.pdf</a></li><li id="ref-12">P. Taylor and X. Wang, &quot;Deicer Scaling Resistance of Concrete Mixtures Containing Slag Cement, Phase 3,&quot; National Concrete Pavement Technology Center, Ames, IA, Rep. TPF-5(100), 2014. [Online]. Available: <a href="https://www.intrans.iastate.edu/wp-content/uploads/2018/03/deicer_scaling_w_cvr.pdf" rel="noopener noreferrer" target="_blank">https://www.intrans.iastate.edu/wp-content/uploads/2018/03/deicer_scaling_w_cvr.pdf</a></li><li id="ref-13">R. D. Hooton and D. Vassilev, &quot;Deicer Scaling Resistance of Concrete Mixtures Containing Slag Cement, Phase 2,&quot; National Concrete Pavement Technology Center, Ames, IA, Rep. TPF-5(100), 2012. [Online]. Available: <a href="https://www.intrans.iastate.edu/research/completed/deicer-scaling-resistance-of-concrete-pavements-bridge-decks-and-other-structures-containing-slag-cement-phase-2-evaluation-of-different-laboratory-scaling-test-methods/" rel="noopener noreferrer" target="_blank">https://www.intrans.iastate.edu/research/completed/deicer-scaling-resistance-of-concrete-pavements-bridge-decks-and-other-structures-containing-slag-cement-phase-2-evaluation-of-different-laboratory-scaling-test-methods/</a></li><li id="ref-14">P. Tikalsky, P. Taylor, S. Hanson, and P. Ghosh, &quot;Development of Performance Properties of Ternary Mixtures: Laboratory Study on Concrete,&quot; National Concrete Pavement Technology Center, Ames, IA, Rep. TPF-5(117), 2011. [Online]. Available: <a href="https://www.intrans.iastate.edu/research/completed/development-of-performance-properties-of-ternary-mixtures-laboratory-study-on-concrete/" rel="noopener noreferrer" target="_blank">https://www.intrans.iastate.edu/research/completed/development-of-performance-properties-of-ternary-mixtures-laboratory-study-on-concrete/</a></li><li id="ref-15">D. Harrington, R. Rasmussen, D. Merritt, T. Cackler, and P. Taylor, &quot;Long-Term Plan for Concrete Pavement Research and Technology—The Concrete Pavement Road Map (Second Generation): Volume II, Tracks (FHWA-HRT-11-070),&quot; National Center for Concrete Pavement Technology, Iowa State University, Ames, IA, 2012. [Online]. Available: <a href="https://www.fhwa.dot.gov/publications/research/infrastructure/pavements/pccp/11070/11070.pdf" rel="noopener noreferrer" target="_blank">https://www.fhwa.dot.gov/publications/research/infrastructure/pavements/pccp/11070/11070.pdf</a></li><li id="ref-16">K. Wang, S. P. Shah, J. Grove, P. Taylor, P. Wiegand, B. Steffes, G. Lomboy, Z. Quanji, L. Gang, and N. Tregger, &quot;Self-Consolidating Concrete—Applications for Slip-Form Paving: Phase II,&quot; National Concrete Pavement Technology Center, Ames, IA, Rep. TPF-5(098), 2011. [Online]. Available: <a href="https://www.intrans.iastate.edu/wp-content/uploads/2018/03/SCC_Phase_2_final_report-edited_wcover.pdf" rel="noopener noreferrer" target="_blank">https://www.intrans.iastate.edu/wp-content/uploads/2018/03/SCC_Phase_2_final_report-edited_wcover.pdf</a></li><li id="ref-17">V. R. Schaefer and J. T. Kevern, &quot;An Integrated Study of Pervious Concrete Mixture Design for Wearing Course Applications,&quot; National Concrete Pavement Technology Center, Ames, IA, 2011. [Online]. Available: <a href="https://www.intrans.iastate.edu/wp-content/uploads/2018/03/pervious_overlay_report_w_cvr.pdf" rel="noopener noreferrer" target="_blank">https://www.intrans.iastate.edu/wp-content/uploads/2018/03/pervious_overlay_report_w_cvr.pdf</a></li><li id="ref-18">P. Taylor, F. Bektas, E. Yurdakul, and H. Ceylan, &quot;Optimizing Cementitious Content in Concrete Mixtures for Required Performance,&quot; National Concrete Pavement Technology Center, Ames, IA, 2012. [Online]. Available: <a href="https://www.intrans.iastate.edu/wp-content/uploads/2018/03/taylor_ocm_w_cvr2.pdf" rel="noopener noreferrer" target="_blank">https://www.intrans.iastate.edu/wp-content/uploads/2018/03/taylor_ocm_w_cvr2.pdf</a></li><li id="ref-19">P. C. Taylor, E. Yurdakul, and H. Ceylan, &quot;Concrete Pavement MDA: Application of a Portable X-Ray Fluorescence Technique to Assess Concrete Mix Proportions,&quot; National Concrete Pavement Technology Center, Ames, IA, Rep. TPF-5(205), 2012. [Online]. Available: <a href="https://www.intrans.iastate.edu/research/completed/concrete-pavement-mixture-design-and-analysis/" rel="noopener noreferrer" target="_blank">https://www.intrans.iastate.edu/research/completed/concrete-pavement-mixture-design-and-analysis/</a></li><li id="ref-20">P. Taylor and X. Wang, &quot;Concrete Pavement MDA: Comparison of Setting Time Measured Using Ultrasonic Wave Propagation With Saw-Cutting Times on Pavements in Iowa,&quot; National Concrete Pavement Technology Center, Ames, IA, Rep. TPF-5(205), 2014. [Online]. Available: <a href="https://www.intrans.iastate.edu/research/completed/comparison-of-setting-time-measured-using-ultrasonic-wave-propagation-with-saw-cutting-times-on-pavements-in-iowa/" rel="noopener noreferrer" target="_blank">https://www.intrans.iastate.edu/research/completed/comparison-of-setting-time-measured-using-ultrasonic-wave-propagation-with-saw-cutting-times-on-pavements-in-iowa/</a></li><li id="ref-21">P. Taylor, T. Hosteng, X. Wang, and B. Phares, &quot;Evaluation and Testing of a Lightweight Fine Aggregate Concrete Bridge Deck in Buchanan County, Iowa,&quot; National Concrete Pavement Technology Center and Bridge Engineering Center, Ames, IA, Rep. TR-648, 2016. [Online]. Available: <a href="https://www.intrans.iastate.edu/wp-content/uploads/2018/03/Buchanan_LWFA_bridge_deck_w_cvr.pdf" rel="noopener noreferrer" target="_blank">https://www.intrans.iastate.edu/wp-content/uploads/2018/03/Buchanan_LWFA_bridge_deck_w_cvr.pdf</a></li>
+</ol>
+</section></article>
+<div id="uc-banner" role="status" title="This page is still being built and may change."><span aria-hidden="true">🚧</span> Under construction</div>
+</main>
+</div>
+<script>
+(function () {
+  var toggle = document.getElementById('navToggle');
+  var sidebar = document.getElementById('sidebar');
+  var mobile = window.matchMedia('(max-width: 760px)');
+  function setInert() { if (sidebar) { if (mobile.matches && !sidebar.classList.contains('open')) { sidebar.setAttribute('inert', ''); } else { sidebar.removeAttribute('inert'); } } }
+  setInert();
+  if (mobile.addEventListener) mobile.addEventListener('change', setInert);
+  if (toggle && sidebar) {
+    toggle.addEventListener('click', function () {
+      var open = sidebar.classList.toggle('open');
+      toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+      if (open) {
+        sidebar.removeAttribute('inert');
+        var first = sidebar.querySelector('input, a, summary');
+        if (first) first.focus();
+      } else {
+        setInert();
+        toggle.focus();
+      }
+    });
+    sidebar.addEventListener('click', function (e) {
+      if (e.target.closest('a') && mobile.matches) {
+        sidebar.classList.remove('open');
+        toggle.setAttribute('aria-expanded', 'false');
+        setInert();
+      }
+    });
+  }
+  var filter = document.getElementById('filter');
+  var tree = document.getElementById('tree');
+  if (filter && tree) {
+    var snapshot = new Set();
+    tree.querySelectorAll('details').forEach(function (d) { if (d.hasAttribute('open')) snapshot.add(d); });
+    filter.addEventListener('input', function () {
+      var q = filter.value.trim().toLowerCase();
+      var items = tree.querySelectorAll('li');
+      if (!q) {
+        items.forEach(function (li) { li.hidden = false; });
+        tree.querySelectorAll('details').forEach(function (d) { d.open = snapshot.has(d); });
+        return;
+      }
+      items.forEach(function (li) { li.hidden = true; });
+      tree.querySelectorAll('li > a').forEach(function (a) {
+        if (a.textContent.toLowerCase().indexOf(q) === -1) return;
+        var li = a.parentElement;
+        li.hidden = false;
+        var p = li.parentElement;
+        while (p && p !== tree) {
+          if (p.tagName === 'LI') p.hidden = false;
+          if (p.tagName === 'DETAILS') p.open = true;
+          p = p.parentElement;
+        }
+      });
+    });
+  }
+})();
+</script>
+</body>
+</html>
