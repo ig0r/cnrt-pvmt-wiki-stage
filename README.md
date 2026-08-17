@@ -39,12 +39,7 @@ cross-links to `review.html`, so both are co-hosted):
 - `review_before.html` — Review (BEFORE re-parenting):
   <https://ig0r.github.io/cnrt-pvmt-wiki-stage/review_before.html>
 
-Plus standalone **reviewer preview** pages (stage only) — the `*-a.html` variants, each rendered
-standalone (empty sidebar, not wired into the wiki nav) for direct-link review, e.g.
-<https://ig0r.github.io/cnrt-pvmt-wiki-stage/concrete-materials-and-mixtures-a.html>.
-
-All of the above survive wiki re-syncs via `--exclude` entries in `deploy_wiki.sh`: the review pages
-by name, the reviewer previews via a `*-a.html` glob.
+Both survive wiki re-syncs via the `--exclude` entries for them in `deploy_wiki.sh`'s `REVIEW_FILES`.
 
 ## Re-syncing a fresh build
 
