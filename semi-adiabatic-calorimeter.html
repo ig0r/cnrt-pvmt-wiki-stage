@@ -240,7 +240,7 @@ article p:has(img) em { color: var(--sub); font-size: .9rem; line-height: 1.5; }
 <!-- HIER-DIAGRAM:START -->
 <p>This overview of Semi-adiabatic Calorimeter from <a href="https://www.cptechcenter.org">CP Tech Center</a> reports also covers the following subtopics: <a href="coffee-cup-test.html">Coffee Cup Test</a> and <a href="dewar-test.html">Dewar Test</a>.</p>
 <figure class="hier-diagram" role="group" aria-label="Concept map: Semi-adiabatic Calorimeter and its subtopics">
-  <svg class="hd" viewBox="0 0 358 192" role="img" xmlns="http://www.w3.org/2000/svg">
+  <svg class="hd" viewBox="0 0 358 192" width="358" height="192" role="img" xmlns="http://www.w3.org/2000/svg">
     <g class="hd-hub"><rect x="74" y="16" width="210" height="48" rx="6"/><text class="hd-hub-label" text-anchor="middle" dominant-baseline="central" font-size="14"><tspan x="179" y="40">Semi-adiabatic Calorimeter</tspan></text></g>
     <path class="hd-edge" d="M179 64 V 96 H 91 V 128"/>
     <path class="hd-edge" d="M179 64 V 96 H 267 V 128"/>
@@ -473,7 +473,7 @@ article p:has(img) em { color: var(--sub); font-size: .9rem; line-height: 1.5; }
 <style>
 /* FR-MH-D.3: hierarchy concept-map diagram (md->html reverse builder; per-page inject) */
 figure.hier-diagram { overflow-x: auto; margin: 1.5rem 0; }
-svg.hd { max-width: 100%; height: auto;
+svg.hd { max-width: 100%; height: auto; display: block; margin-inline: auto;
   font: 500 13px/1.2 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
 svg.hd text { text-anchor: middle; dominant-baseline: middle; }
 svg.hd .hd-hub rect { fill: var(--accent); stroke: var(--accent); }
